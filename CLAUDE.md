@@ -29,7 +29,9 @@ Monorepo: `backend/` (FastAPI) + `frontend/` (Next.js). Postgres on Supabase.
 - Frontend: `npm run dev` · `npm run build` · `npm run lint`
 
 ## Deploy
-- Backend → Railway (Dockerfile). Frontend → Vercel. CORS allowlist = Vercel origin only.
+- One Vercel project, two Services (`vercel.json`): `frontend` (Next.js) + `backend` (FastAPI). Backend is internal; frontend reaches it via `BACKEND_INTERNAL_URL` binding.
+- Migrations are not run on deploy: run `alembic upgrade head` against Supabase manually/CI before deploying.
+- CORS allowlist = Vercel origin only.
 
 ## Roles
 Two roles only: `user`, `admin`.

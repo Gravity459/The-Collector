@@ -5,7 +5,9 @@ import { cookies } from "next/headers";
 import { COOKIE_NAME } from "./types";
 
 export const BACKEND_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+  process.env.BACKEND_INTERNAL_URL ??
+  process.env.NEXT_PUBLIC_API_URL ??
+  "http://localhost:8000";
 
 /** Read the JWT from the httpOnly cookie (server-side only). */
 export async function getToken(): Promise<string | null> {

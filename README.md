@@ -3,7 +3,7 @@
 Amount-collection app. Authenticated **users** submit collection amounts against a house;
 **admins** approve them and records persist.
 
-- **Backend**: FastAPI + async SQLAlchemy + Alembic on Supabase Postgres → Railway. See [`backend/`](backend/).
+- **Backend**: FastAPI + async SQLAlchemy + Alembic on Supabase Postgres → Vercel (Service). See [`backend/`](backend/).
 - **Frontend**: Next.js (App Router) + Tailwind + TanStack Query → Vercel. See [`frontend/`](frontend/).
 
 ## Docs

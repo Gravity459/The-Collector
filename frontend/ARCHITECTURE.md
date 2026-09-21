@@ -48,4 +48,4 @@ lib/
 `StatusPill` renders a pill: green (`approved`) / grey (`pending`). Single source of truth for status styling.
 
 ## Deployment
-Vercel. Env `NEXT_PUBLIC_API_URL` points to the Railway backend. CORS on the backend allowlists the Vercel origin.
+Vercel Service. Backend URL comes from `BACKEND_INTERNAL_URL` (service binding); `NEXT_PUBLIC_API_URL` is the local-dev fallback.
