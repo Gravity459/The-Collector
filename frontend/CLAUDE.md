@@ -9,7 +9,7 @@ Next.js (App Router, TypeScript) · Tailwind CSS · TanStack Query · Axios · r
 - App Router only. Server Components by default; add `"use client"` only where interactivity/hooks are needed.
 - All server data goes through TanStack Query hooks in `lib/` — no ad-hoc `fetch` in components.
 - Auth: JWT stored in an **httpOnly cookie** set by a Next route handler (`app/api/auth/*`). Never localStorage.
-- `middleware.ts` guards `/dashboard/*` — redirect to `/login` when no valid session cookie.
+- `app/dashboard/layout.tsx` guards `/dashboard/*` — redirects to `/login` when no session cookie. No `middleware.ts`: Edge runtime is unsupported in Vercel Services.
 - Role drives UI (`user` vs `admin` Overview) but is presentation only; the backend enforces access.
 - Forms use react-hook-form + zod schemas. Validate before submit.
 - Status is a **pill**: green = Approved, grey = Pending Approval. Use the shared `StatusPill` component.

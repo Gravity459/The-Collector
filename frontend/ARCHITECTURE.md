@@ -9,10 +9,9 @@ app/
   api/auth/login/route.ts      # proxies backend login, sets httpOnly cookie
   api/auth/logout/route.ts     # clears cookie
   dashboard/
-    layout.tsx                 # sidebar shell (Overview entry)
+    layout.tsx                 # sidebar shell + cookie guard (redirects to /login)
     overview/page.tsx          # role-conditional Overview
   layout.tsx                   # root layout + QueryClient provider
-middleware.ts                  # guards /dashboard/*
 components/
   Sidebar.tsx  DataTable.tsx  StatusPill.tsx  Pagination.tsx
   HouseFilter.tsx  ApproveButton.tsx  CollectionForm.tsx
@@ -26,7 +25,7 @@ lib/
 ## Auth flow
 1. `login/page.tsx` posts credentials to `app/api/auth/login/route.ts`.
 2. The route handler calls the backend `/auth/login`, receives JWT, sets it as an httpOnly cookie.
-3. `middleware.ts` checks the cookie on `/dashboard/*`; redirects to `/login` if missing.
+3. `app/dashboard/layout.tsx` checks the cookie; redirects to `/login` if missing.
 4. Client hooks read the current user via `/auth/me` to branch the UI on role.
 
 ## Data fetching

@@ -1,11 +1,16 @@
+import { redirect } from "next/navigation";
+
 import { Sidebar } from "@/components/Sidebar";
 import { Topbar } from "@/components/Topbar";
+import { getToken } from "@/lib/server";
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  if (!(await getToken())) redirect("/login");
+
   return (
     <div className="md:flex md:min-h-screen">
       <Sidebar />
