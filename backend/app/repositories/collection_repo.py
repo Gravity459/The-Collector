@@ -33,6 +33,14 @@ class CollectionRepository:
         )
         return bool(result)
 
+    async def sum_current_month(self) -> int:
+        result = await self.db.scalar(
+            select(func.coalesce(func.sum(Collection.amount), 0))
+            .where(Collection.approved.is_(True))
+            .where(Collection.created_at >= func.date_trunc("month", func.now()))
+        )
+        return int(result or 0)
+
     async def create(self, *, house_id: uuid.UUID, amount: int) -> Collection:
         collection = Collection(house_id=house_id, amount=amount, approved=False)
         self.db.add(collection)

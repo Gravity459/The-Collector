@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { useCollections } from "@/lib/queries";
+import { useCollections, useCurrentMonthTotal } from "@/lib/queries";
 
 import { CollectionsTable } from "./CollectionsTable";
 import { HouseFilter } from "./HouseFilter";
@@ -24,6 +24,12 @@ export function AdminView() {
     size: 10,
     house_number: houseNumber,
     approved: true,
+  });
+  const total = useCurrentMonthTotal();
+
+  const monthLabel = new Date().toLocaleString(undefined, {
+    month: "long",
+    year: "numeric",
   });
 
   const card =
@@ -49,6 +55,15 @@ export function AdminView() {
           }}
         />
       </div>
+
+      <section className={`${card} p-5`}>
+        <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+          Total approved collection · {monthLabel}
+        </p>
+        <p className="mt-1 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900 dark:text-zinc-100">
+          {total.isLoading ? "…" : (total.data?.total ?? 0).toLocaleString()}
+        </p>
+      </section>
 
       <section className={card}>
         <div className="flex items-center gap-2 p-4">

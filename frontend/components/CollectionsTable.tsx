@@ -1,6 +1,7 @@
 import type { Collection } from "@/lib/types";
 
 import { ApproveButton } from "./ApproveButton";
+import { RejectButton } from "./RejectButton";
 import { RemoveButton } from "./RemoveButton";
 import { StatusPill } from "./StatusPill";
 
@@ -77,9 +78,12 @@ export function CollectionsTable({ items, isLoading, mode, withRemove }: Props) 
                 {formatDate(c.created_at)}
               </td>
               <td className={td}>
-                <div className="flex justify-center">
+                <div className="flex items-center justify-center gap-2">
                   {mode === "approve" ? (
-                    <ApproveButton id={c.id} />
+                    <>
+                      <ApproveButton id={c.id} />
+                      <RejectButton id={c.id} houseNumber={c.house_number} />
+                    </>
                   ) : (
                     <StatusPill approved={c.approved} />
                   )}

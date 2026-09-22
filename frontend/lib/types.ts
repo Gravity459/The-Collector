@@ -19,6 +19,10 @@ export interface Collection {
   updated_at: string;
 }
 
+export interface CollectionTotal {
+  total: number;
+}
+
 export interface Page<T> {
   items: T[];
   page: number;

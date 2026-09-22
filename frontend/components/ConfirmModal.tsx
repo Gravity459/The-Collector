@@ -8,6 +8,7 @@ interface Props {
   message: string;
   confirmLabel?: string;
   cancelLabel?: string;
+  loadingLabel?: string;
   loading?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
@@ -19,6 +20,7 @@ export function ConfirmModal({
   message,
   confirmLabel = "Remove",
   cancelLabel = "Cancel",
+  loadingLabel,
   loading = false,
   onConfirm,
   onCancel,
@@ -46,14 +48,34 @@ export function ConfirmModal({
       aria-modal="true"
     >
       <div
-        className="w-full max-w-sm rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl animate-scale-in dark:border-zinc-800 dark:bg-zinc-900"
+        className="relative w-full max-w-sm rounded-3xl border border-zinc-200 bg-white p-8 shadow-xl animate-scale-in dark:border-zinc-800 dark:bg-zinc-900"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-start gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-500/15 dark:text-red-400">
+        <button
+          onClick={onCancel}
+          disabled={loading}
+          aria-label="Close"
+          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-600 disabled:opacity-60 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
+
+        <div className="flex flex-col items-center text-center">
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-500/15 dark:text-red-400">
             <svg
-              width="20"
-              height="20"
+              width="26"
+              height="26"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -61,34 +83,32 @@ export function ConfirmModal({
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
-              <path d="M10 11v6M14 11v6" />
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 8v5M12 16h.01" />
             </svg>
           </span>
-          <div className="min-w-0">
-            <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-              {title}
-            </h3>
-            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-              {message}
-            </p>
-          </div>
+          <h3 className="mt-5 text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+            {title}
+          </h3>
+          <p className="mt-3 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+            {message}
+          </p>
         </div>
 
-        <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <div className="mt-8 grid grid-cols-2 gap-3">
           <button
             onClick={onCancel}
             disabled={loading}
-            className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 disabled:opacity-60 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+            className="rounded-xl bg-zinc-100 px-4 py-3 text-sm font-semibold text-zinc-800 transition hover:bg-zinc-200 disabled:opacity-60 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
           >
             {cancelLabel}
           </button>
           <button
             onClick={onConfirm}
             disabled={loading}
-            className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 disabled:opacity-60"
+            className="rounded-xl bg-red-500 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-red-600 disabled:opacity-60"
           >
-            {loading ? "Removing…" : confirmLabel}
+            {loading ? loadingLabel ?? `${confirmLabel}…` : confirmLabel}
           </button>
         </div>
       </div>

@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-query";
 
 import { api } from "./api";
-import type { Collection, Page, User } from "./types";
+import type { Collection, CollectionTotal, Page, User } from "./types";
 
 export interface CollectionFilters {
   page?: number;
@@ -34,6 +34,14 @@ export function useCollections(filters: CollectionFilters) {
       if (approved != null) params.approved = String(approved);
       return (await api.get<Page<Collection>>("/collections", { params })).data;
     },
+  });
+}
+
+export function useCurrentMonthTotal() {
+  return useQuery<CollectionTotal>({
+    queryKey: ["collections", "total"],
+    queryFn: async () =>
+      (await api.get<CollectionTotal>("/collections/total")).data,
   });
 }
 

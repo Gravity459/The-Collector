@@ -150,6 +150,65 @@ async def test_delete_approved_collection(client, admin_token, user_token):
     assert listing.json()["total"] == 0
 
 
+async def test_reject_deletes_pending_collection(client, admin_token, user_token):
+    created = await client.post(
+        "/api/v1/collections",
+        headers=_auth(user_token),
+        json={"house_number": 8, "amount": 400},
+    )
+    collection_id = created.json()["id"]
+
+    # user cannot reject/delete
+    forbidden = await client.delete(
+        f"/api/v1/collections/{collection_id}", headers=_auth(user_token)
+    )
+    assert forbidden.status_code == 403
+
+    # admin rejects the pending collection
+    rejected = await client.delete(
+        f"/api/v1/collections/{collection_id}", headers=_auth(admin_token)
+    )
+    assert rejected.status_code == 204
+
+    # gone from pending
+    pending = await client.get(
+        "/api/v1/collections?approved=false", headers=_auth(admin_token)
+    )
+    assert pending.json()["total"] == 0
+
+
+async def test_current_month_total_counts_approved_only(
+    client, admin_token, user_token
+):
+    ids = []
+    for hn, amount in ((61, 100), (62, 250), (63, 400)):
+        created = await client.post(
+            "/api/v1/collections",
+            headers=_auth(user_token),
+            json={"house_number": hn, "amount": amount},
+        )
+        ids.append(created.json()["id"])
+
+    # user cannot read the total
+    forbidden = await client.get(
+        "/api/v1/collections/total", headers=_auth(user_token)
+    )
+    assert forbidden.status_code == 403
+
+    # nothing approved yet -> 0
+    zero = await client.get("/api/v1/collections/total", headers=_auth(admin_token))
+    assert zero.status_code == 200
+    assert zero.json()["total"] == 0
+
+    # approve two of the three -> total is their sum, pending excluded
+    for cid in ids[:2]:
+        await client.patch(
+            f"/api/v1/collections/{cid}/approve", headers=_auth(admin_token)
+        )
+    resp = await client.get("/api/v1/collections/total", headers=_auth(admin_token))
+    assert resp.json()["total"] == 350
+
+
 async def test_house_number_filter(client, admin_token, user_token):
     for hn in (10, 20, 30):
         await client.post(

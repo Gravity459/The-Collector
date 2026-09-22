@@ -22,3 +22,7 @@ class CollectionOut(BaseModel):
     approved: bool
     created_at: datetime
     updated_at: datetime
+
+
+class CollectionTotal(BaseModel):
+    total: int

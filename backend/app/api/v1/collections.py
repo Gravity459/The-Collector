@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.deps import get_current_user, require_role
 from app.db.session import get_db
 from app.models.users import User
-from app.schemas.collection import CollectionCreate, CollectionOut
+from app.schemas.collection import CollectionCreate, CollectionOut, CollectionTotal
 from app.schemas.common import Page, PageParams
 from app.services.collection_service import CollectionService
 
@@ -47,6 +47,14 @@ async def list_collections(
     return await service.list(
         params, house_number=house_number, current_month_only=True
     )
+
+
+@router.get("/total", response_model=CollectionTotal)
+async def current_month_total(
+    db: AsyncSession = Depends(get_db),
+    _admin: User = Depends(require_role("admin")),
+) -> CollectionTotal:
+    return await CollectionService(db).current_month_total()
 
 
 @router.patch("/{collection_id}/approve", response_model=CollectionOut)

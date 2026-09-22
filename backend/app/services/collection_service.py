@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.collection import Collection
 from app.repositories.collection_repo import CollectionRepository
 from app.repositories.house_repo import HouseRepository
-from app.schemas.collection import CollectionCreate, CollectionOut
+from app.schemas.collection import CollectionCreate, CollectionOut, CollectionTotal
 from app.schemas.common import Page, PageParams
 from app.utils.pagination import build_page
 
@@ -65,6 +65,10 @@ class CollectionService:
                 status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found"
             )
         await self.collections.delete(collection)
+
+    async def current_month_total(self) -> CollectionTotal:
+        total = await self.collections.sum_current_month()
+        return CollectionTotal(total=total)
 
     async def list(
         self,
