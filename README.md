@@ -29,8 +29,3 @@ cp .env.local.example .env.local   # set NEXT_PUBLIC_API_URL
 npm install
 npm run dev
 ```
-
-## Build phases
-See the approved plan. Phases 0–12: docs → backend foundation → models/migrations →
-auth/RBAC → users → collections → tests/deploy → frontend foundation → dashboard →
-user view → admin view → frontend deploy.
