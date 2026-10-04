@@ -1,10 +1,13 @@
 """FastAPI application factory."""
 from __future__ import annotations
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
+from app.db.session import get_db
 
 
 def create_app() -> FastAPI:
@@ -21,6 +24,12 @@ def create_app() -> FastAPI:
 
     @app.get("/health", tags=["health"])
     async def health() -> dict[str, str]:
+        return {"status": "ok"}
+
+    @app.get("/health/db", tags=["health"])
+    async def health_db(db: AsyncSession = Depends(get_db)) -> dict[str, str]:
+        # Real DB query; pinged daily by Vercel Cron to keep Supabase free tier awake.
+        await db.execute(text("SELECT 1"))
         return {"status": "ok"}
 
     # Routers (mounted as phases land)
