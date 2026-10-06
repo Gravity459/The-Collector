@@ -20,6 +20,7 @@ class CollectionOut(BaseModel):
     house_number: int
     amount: int
     approved: bool
+    collector_name: str | None = None
     created_at: datetime
     updated_at: datetime
 

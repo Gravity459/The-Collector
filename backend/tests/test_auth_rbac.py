@@ -1,11 +1,11 @@
-async def _auth(token: str) -> dict[str, str]:
+def _auth(token: str) -> dict[str, str]:
     return {"Authorization": f"Bearer {token}"}
 
 
 async def test_login_bad_credentials(client, seeded_admin):
     resp = await client.post(
         "/api/v1/auth/login",
-        json={"email": "admin@test.local", "password": "wrong"},
+        json={"email": "admin@example.com", "password": "wrong"},
     )
     assert resp.status_code == 401
 
@@ -14,7 +14,7 @@ async def test_me(client, admin_token):
     resp = await client.get("/api/v1/auth/me", headers=_auth(admin_token))
     assert resp.status_code == 200
     body = resp.json()
-    assert body["email"] == "admin@test.local"
+    assert body["email"] == "admin@example.com"
     assert body["role"] == "admin"
     assert "password" not in body
 
@@ -25,7 +25,7 @@ async def test_admin_creates_user_then_user_logs_in(client, admin_token):
         headers=_auth(admin_token),
         json={
             "name": "Resident",
-            "email": "resident@test.local",
+            "email": "resident@example.com",
             "password": "resident-123",
             "role": "user",
         },
@@ -34,7 +34,7 @@ async def test_admin_creates_user_then_user_logs_in(client, admin_token):
 
     login = await client.post(
         "/api/v1/auth/login",
-        json={"email": "resident@test.local", "password": "resident-123"},
+        json={"email": "resident@example.com", "password": "resident-123"},
     )
     assert login.status_code == 200
 
@@ -46,14 +46,14 @@ async def test_user_cannot_create_user(client, admin_token):
         headers=_auth(admin_token),
         json={
             "name": "Resident",
-            "email": "resident@test.local",
+            "email": "resident@example.com",
             "password": "resident-123",
             "role": "user",
         },
     )
     login = await client.post(
         "/api/v1/auth/login",
-        json={"email": "resident@test.local", "password": "resident-123"},
+        json={"email": "resident@example.com", "password": "resident-123"},
     )
     user_token = login.json()["access_token"]
 
@@ -62,7 +62,7 @@ async def test_user_cannot_create_user(client, admin_token):
         headers=_auth(user_token),
         json={
             "name": "X",
-            "email": "x@test.local",
+            "email": "x@example.com",
             "password": "password-123",
             "role": "user",
         },

@@ -1,5 +1,5 @@
-import { Spinner } from "@/components/Spinner";
+import { PageSkeleton } from "@/components/PageSkeleton";
 
 export default function DashboardLoading() {
-  return <Spinner size="lg" label="Loading…" center />;
+  return <PageSkeleton />;
 }

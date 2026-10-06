@@ -1,0 +1,1047 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-06T10:13:35.657Z",
+  "title": "Design System: The Collector",
+  "extensions": {
+    "themes": {
+      "note": "Tokens are RGB triplets in app/globals.css: light on :root, dark on .dark (class set before hydration in app/layout.tsx). Frontmatter keys without a suffix are the .dark values; -light keys are the :root values. Component CSS uses rgb(var(--token)) so it follows the active theme.",
+      "tailwindMapping": "tailwind.config.ts maps bg, surface (+2), border (+strong), fg (+muted, subtle), on-fg, success, pending, danger, role-admin, role-collector, role-user (each +bg) and chart.1 to rgb(var(--x) / <alpha-value>)."
+    },
+    "colorMeta": {
+      "ground": {
+        "role": "neutral",
+        "displayName": "Night Ground",
+        "canonical": "rgb(10 10 10)",
+        "cssVariable": "--bg (.dark)",
+        "tonalRamp": [
+          "#0A0A0A",
+          "#1C1C1C",
+          "#333333",
+          "#52525B",
+          "#71717A",
+          "#A1A1A1",
+          "#E4E4E7",
+          "#FAFAFA"
+        ]
+      },
+      "ground-light": {
+        "role": "neutral",
+        "displayName": "Night Ground (light)",
+        "canonical": "rgb(250 250 250)",
+        "cssVariable": "--bg (:root)",
+        "tonalRamp": [
+          "#0A0A0A",
+          "#1C1C1C",
+          "#333333",
+          "#52525B",
+          "#71717A",
+          "#A1A1A1",
+          "#E4E4E7",
+          "#FAFAFA"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Panel Surface",
+        "canonical": "rgb(15 15 15)",
+        "cssVariable": "--surface (.dark)",
+        "tonalRamp": [
+          "#0A0A0A",
+          "#1C1C1C",
+          "#333333",
+          "#52525B",
+          "#71717A",
+          "#A1A1A1",
+          "#E4E4E7",
+          "#FAFAFA"
+        ]
+      },
+      "surface-light": {
+        "role": "neutral",
+        "displayName": "Panel Surface (light)",
+        "canonical": "rgb(255 255 255)",
+        "cssVariable": "--surface (:root)",
+        "tonalRamp": [
+          "#0A0A0A",
+          "#1C1C1C",
+          "#333333",
+          "#52525B",
+          "#71717A",
+          "#A1A1A1",
+          "#E4E4E7",
+          "#FAFAFA"
+        ]
+      },
+      "surface-raised": {
+        "role": "neutral",
+        "displayName": "Raised Surface",
+        "canonical": "rgb(28 28 28)",
+        "cssVariable": "--surface-2 (.dark)",
+        "tonalRamp": [
+          "#0A0A0A",
+          "#1C1C1C",
+          "#333333",
+          "#52525B",
+          "#71717A",
+          "#A1A1A1",
+          "#E4E4E7",
+          "#FAFAFA"
+        ]
+      },
+      "surface-raised-light": {
+        "role": "neutral",
+        "displayName": "Raised Surface (light)",
+        "canonical": "rgb(244 244 245)",
+        "cssVariable": "--surface-2 (:root)",
+        "tonalRamp": [
+          "#0A0A0A",
+          "#1C1C1C",
+          "#333333",
+          "#52525B",
+          "#71717A",
+          "#A1A1A1",
+          "#E4E4E7",
+          "#FAFAFA"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "rgb(38 38 38)",
+        "cssVariable": "--border (.dark)",
+        "tonalRamp": [
+          "#0A0A0A",
+          "#1C1C1C",
+          "#333333",
+          "#52525B",
+          "#71717A",
+          "#A1A1A1",
+          "#E4E4E7",
+          "#FAFAFA"
+        ]
+      },
+      "hairline-light": {
+        "role": "neutral",
+        "displayName": "Hairline (light)",
+        "canonical": "rgb(228 228 231)",
+        "cssVariable": "--border (:root)",
+        "tonalRamp": [
+          "#0A0A0A",
+          "#1C1C1C",
+          "#333333",
+          "#52525B",
+          "#71717A",
+          "#A1A1A1",
+          "#E4E4E7",
+          "#FAFAFA"
+        ]
+      },
+      "hairline-strong": {
+        "role": "neutral",
+        "displayName": "Strong Hairline",
+        "canonical": "rgb(51 51 51)",
+        "cssVariable": "--border-strong (.dark)",
+        "tonalRamp": [
+          "#0A0A0A",
+          "#1C1C1C",
+          "#333333",
+          "#52525B",
+          "#71717A",
+          "#A1A1A1",
+          "#E4E4E7",
+          "#FAFAFA"
+        ]
+      },
+      "hairline-strong-light": {
+        "role": "neutral",
+        "displayName": "Strong Hairline (light)",
+        "canonical": "rgb(212 212 216)",
+        "cssVariable": "--border-strong (:root)",
+        "tonalRamp": [
+          "#0A0A0A",
+          "#1C1C1C",
+          "#333333",
+          "#52525B",
+          "#71717A",
+          "#A1A1A1",
+          "#E4E4E7",
+          "#FAFAFA"
+        ]
+      },
+      "ink": {
+        "role": "primary",
+        "displayName": "Ledger Ink",
+        "canonical": "rgb(237 237 237)",
+        "cssVariable": "--fg (.dark)",
+        "tonalRamp": [
+          "#0A0A0A",
+          "#1C1C1C",
+          "#333333",
+          "#52525B",
+          "#71717A",
+          "#A1A1A1",
+          "#E4E4E7",
+          "#FAFAFA"
+        ]
+      },
+      "ink-light": {
+        "role": "primary",
+        "displayName": "Ledger Ink (light)",
+        "canonical": "rgb(10 10 10)",
+        "cssVariable": "--fg (:root)",
+        "tonalRamp": [
+          "#0A0A0A",
+          "#1C1C1C",
+          "#333333",
+          "#52525B",
+          "#71717A",
+          "#A1A1A1",
+          "#E4E4E7",
+          "#FAFAFA"
+        ]
+      },
+      "ink-muted": {
+        "role": "neutral",
+        "displayName": "Muted Ink",
+        "canonical": "rgb(161 161 161)",
+        "cssVariable": "--fg-muted (.dark)",
+        "tonalRamp": [
+          "#0A0A0A",
+          "#1C1C1C",
+          "#333333",
+          "#52525B",
+          "#71717A",
+          "#A1A1A1",
+          "#E4E4E7",
+          "#FAFAFA"
+        ]
+      },
+      "ink-muted-light": {
+        "role": "neutral",
+        "displayName": "Muted Ink (light)",
+        "canonical": "rgb(82 82 91)",
+        "cssVariable": "--fg-muted (:root)",
+        "tonalRamp": [
+          "#0A0A0A",
+          "#1C1C1C",
+          "#333333",
+          "#52525B",
+          "#71717A",
+          "#A1A1A1",
+          "#E4E4E7",
+          "#FAFAFA"
+        ]
+      },
+      "ink-subtle": {
+        "role": "neutral",
+        "displayName": "Subtle Ink",
+        "canonical": "rgb(138 138 138)",
+        "cssVariable": "--fg-subtle (.dark)",
+        "tonalRamp": [
+          "#0A0A0A",
+          "#1C1C1C",
+          "#333333",
+          "#52525B",
+          "#71717A",
+          "#A1A1A1",
+          "#E4E4E7",
+          "#FAFAFA"
+        ]
+      },
+      "ink-subtle-light": {
+        "role": "neutral",
+        "displayName": "Subtle Ink (light)",
+        "canonical": "rgb(113 113 122)",
+        "cssVariable": "--fg-subtle (:root)",
+        "tonalRamp": [
+          "#0A0A0A",
+          "#1C1C1C",
+          "#333333",
+          "#52525B",
+          "#71717A",
+          "#A1A1A1",
+          "#E4E4E7",
+          "#FAFAFA"
+        ]
+      },
+      "on-ink": {
+        "role": "primary",
+        "displayName": "On-Ink",
+        "canonical": "rgb(10 10 10)",
+        "cssVariable": "--on-fg (.dark)",
+        "tonalRamp": [
+          "#0A0A0A",
+          "#1C1C1C",
+          "#333333",
+          "#52525B",
+          "#71717A",
+          "#A1A1A1",
+          "#E4E4E7",
+          "#FAFAFA"
+        ]
+      },
+      "on-ink-light": {
+        "role": "primary",
+        "displayName": "On-Ink (light)",
+        "canonical": "rgb(255 255 255)",
+        "cssVariable": "--on-fg (:root)",
+        "tonalRamp": [
+          "#0A0A0A",
+          "#1C1C1C",
+          "#333333",
+          "#52525B",
+          "#71717A",
+          "#A1A1A1",
+          "#E4E4E7",
+          "#FAFAFA"
+        ]
+      },
+      "approved": {
+        "role": "status",
+        "displayName": "Approved Green",
+        "canonical": "rgb(74 222 128)",
+        "cssVariable": "--success (.dark)",
+        "tonalRamp": [
+          "#14532D",
+          "#166534",
+          "#15803D",
+          "#16A34A",
+          "#22C55E",
+          "#4ADE80",
+          "#BBF7D0",
+          "#DCFCE7"
+        ]
+      },
+      "approved-light": {
+        "role": "status",
+        "displayName": "Approved Green (light)",
+        "canonical": "rgb(21 128 61)",
+        "cssVariable": "--success (:root)",
+        "tonalRamp": [
+          "#14532D",
+          "#166534",
+          "#15803D",
+          "#16A34A",
+          "#22C55E",
+          "#4ADE80",
+          "#BBF7D0",
+          "#DCFCE7"
+        ]
+      },
+      "approved-bg": {
+        "role": "status",
+        "displayName": "Approved Tint",
+        "canonical": "rgb(14 42 28)",
+        "cssVariable": "--success-bg (.dark)",
+        "tonalRamp": [
+          "#14532D",
+          "#166534",
+          "#15803D",
+          "#16A34A",
+          "#22C55E",
+          "#4ADE80",
+          "#BBF7D0",
+          "#DCFCE7"
+        ]
+      },
+      "approved-bg-light": {
+        "role": "status",
+        "displayName": "Approved Tint (light)",
+        "canonical": "rgb(220 252 231)",
+        "cssVariable": "--success-bg (:root)",
+        "tonalRamp": [
+          "#14532D",
+          "#166534",
+          "#15803D",
+          "#16A34A",
+          "#22C55E",
+          "#4ADE80",
+          "#BBF7D0",
+          "#DCFCE7"
+        ]
+      },
+      "pending": {
+        "role": "status",
+        "displayName": "Pending Grey",
+        "canonical": "rgb(161 161 161)",
+        "cssVariable": "--pending (.dark)",
+        "tonalRamp": [
+          "#0A0A0A",
+          "#1C1C1C",
+          "#333333",
+          "#52525B",
+          "#71717A",
+          "#A1A1A1",
+          "#E4E4E7",
+          "#FAFAFA"
+        ]
+      },
+      "pending-light": {
+        "role": "status",
+        "displayName": "Pending Grey (light)",
+        "canonical": "rgb(82 82 91)",
+        "cssVariable": "--pending (:root)",
+        "tonalRamp": [
+          "#0A0A0A",
+          "#1C1C1C",
+          "#333333",
+          "#52525B",
+          "#71717A",
+          "#A1A1A1",
+          "#E4E4E7",
+          "#FAFAFA"
+        ]
+      },
+      "pending-bg": {
+        "role": "status",
+        "displayName": "Pending Tint",
+        "canonical": "rgb(28 28 28)",
+        "cssVariable": "--pending-bg (.dark)",
+        "tonalRamp": [
+          "#0A0A0A",
+          "#1C1C1C",
+          "#333333",
+          "#52525B",
+          "#71717A",
+          "#A1A1A1",
+          "#E4E4E7",
+          "#FAFAFA"
+        ]
+      },
+      "pending-bg-light": {
+        "role": "status",
+        "displayName": "Pending Tint (light)",
+        "canonical": "rgb(244 244 245)",
+        "cssVariable": "--pending-bg (:root)",
+        "tonalRamp": [
+          "#0A0A0A",
+          "#1C1C1C",
+          "#333333",
+          "#52525B",
+          "#71717A",
+          "#A1A1A1",
+          "#E4E4E7",
+          "#FAFAFA"
+        ]
+      },
+      "danger": {
+        "role": "danger",
+        "displayName": "Danger Red",
+        "canonical": "rgb(248 113 113)",
+        "cssVariable": "--danger (.dark)",
+        "tonalRamp": [
+          "#7F1D1D",
+          "#991B1B",
+          "#B91C1C",
+          "#DC2626",
+          "#EF4444",
+          "#F87171",
+          "#FECACA",
+          "#FEE2E2"
+        ]
+      },
+      "danger-light": {
+        "role": "danger",
+        "displayName": "Danger Red (light)",
+        "canonical": "rgb(220 38 38)",
+        "cssVariable": "--danger (:root)",
+        "tonalRamp": [
+          "#7F1D1D",
+          "#991B1B",
+          "#B91C1C",
+          "#DC2626",
+          "#EF4444",
+          "#F87171",
+          "#FECACA",
+          "#FEE2E2"
+        ]
+      },
+      "danger-bg": {
+        "role": "danger",
+        "displayName": "Danger Tint",
+        "canonical": "rgb(42 15 15)",
+        "cssVariable": "--danger-bg (.dark)",
+        "tonalRamp": [
+          "#7F1D1D",
+          "#991B1B",
+          "#B91C1C",
+          "#DC2626",
+          "#EF4444",
+          "#F87171",
+          "#FECACA",
+          "#FEE2E2"
+        ]
+      },
+      "danger-bg-light": {
+        "role": "danger",
+        "displayName": "Danger Tint (light)",
+        "canonical": "rgb(254 226 226)",
+        "cssVariable": "--danger-bg (:root)",
+        "tonalRamp": [
+          "#7F1D1D",
+          "#991B1B",
+          "#B91C1C",
+          "#DC2626",
+          "#EF4444",
+          "#F87171",
+          "#FECACA",
+          "#FEE2E2"
+        ]
+      },
+      "role-admin": {
+        "role": "role",
+        "displayName": "Admin Violet",
+        "canonical": "rgb(196 181 253)",
+        "cssVariable": "--role-admin (.dark)",
+        "tonalRamp": [
+          "#4C1D95",
+          "#5B21B6",
+          "#6D28D9",
+          "#7C3AED",
+          "#8B5CF6",
+          "#A78BFA",
+          "#C4B5FD",
+          "#EDE9FE"
+        ]
+      },
+      "role-admin-light": {
+        "role": "role",
+        "displayName": "Admin Violet (light)",
+        "canonical": "rgb(109 40 217)",
+        "cssVariable": "--role-admin (:root)",
+        "tonalRamp": [
+          "#4C1D95",
+          "#5B21B6",
+          "#6D28D9",
+          "#7C3AED",
+          "#8B5CF6",
+          "#A78BFA",
+          "#C4B5FD",
+          "#EDE9FE"
+        ]
+      },
+      "role-admin-bg": {
+        "role": "role",
+        "displayName": "Admin Tint",
+        "canonical": "rgb(42 33 64)",
+        "cssVariable": "--role-admin-bg (.dark)",
+        "tonalRamp": [
+          "#4C1D95",
+          "#5B21B6",
+          "#6D28D9",
+          "#7C3AED",
+          "#8B5CF6",
+          "#A78BFA",
+          "#C4B5FD",
+          "#EDE9FE"
+        ]
+      },
+      "role-admin-bg-light": {
+        "role": "role",
+        "displayName": "Admin Tint (light)",
+        "canonical": "rgb(237 233 254)",
+        "cssVariable": "--role-admin-bg (:root)",
+        "tonalRamp": [
+          "#4C1D95",
+          "#5B21B6",
+          "#6D28D9",
+          "#7C3AED",
+          "#8B5CF6",
+          "#A78BFA",
+          "#C4B5FD",
+          "#EDE9FE"
+        ]
+      },
+      "role-collector": {
+        "role": "role",
+        "displayName": "Collector Sky",
+        "canonical": "rgb(125 211 252)",
+        "cssVariable": "--role-collector (.dark)",
+        "tonalRamp": [
+          "#0C4A6E",
+          "#075985",
+          "#0369A1",
+          "#0284C7",
+          "#0EA5E9",
+          "#38BDF8",
+          "#7DD3FC",
+          "#E0F2FE"
+        ]
+      },
+      "role-collector-light": {
+        "role": "role",
+        "displayName": "Collector Sky (light)",
+        "canonical": "rgb(3 105 161)",
+        "cssVariable": "--role-collector (:root)",
+        "tonalRamp": [
+          "#0C4A6E",
+          "#075985",
+          "#0369A1",
+          "#0284C7",
+          "#0EA5E9",
+          "#38BDF8",
+          "#7DD3FC",
+          "#E0F2FE"
+        ]
+      },
+      "role-collector-bg": {
+        "role": "role",
+        "displayName": "Collector Tint",
+        "canonical": "rgb(12 42 58)",
+        "cssVariable": "--role-collector-bg (.dark)",
+        "tonalRamp": [
+          "#0C4A6E",
+          "#075985",
+          "#0369A1",
+          "#0284C7",
+          "#0EA5E9",
+          "#38BDF8",
+          "#7DD3FC",
+          "#E0F2FE"
+        ]
+      },
+      "role-collector-bg-light": {
+        "role": "role",
+        "displayName": "Collector Tint (light)",
+        "canonical": "rgb(224 242 254)",
+        "cssVariable": "--role-collector-bg (:root)",
+        "tonalRamp": [
+          "#0C4A6E",
+          "#075985",
+          "#0369A1",
+          "#0284C7",
+          "#0EA5E9",
+          "#38BDF8",
+          "#7DD3FC",
+          "#E0F2FE"
+        ]
+      },
+      "role-user": {
+        "role": "role",
+        "displayName": "User Amber",
+        "canonical": "rgb(252 211 77)",
+        "cssVariable": "--role-user (.dark)",
+        "tonalRamp": [
+          "#78350F",
+          "#92400E",
+          "#B45309",
+          "#D97706",
+          "#F59E0B",
+          "#FBBF24",
+          "#FCD34D",
+          "#FEF3C7"
+        ]
+      },
+      "role-user-light": {
+        "role": "role",
+        "displayName": "User Amber (light)",
+        "canonical": "rgb(180 83 9)",
+        "cssVariable": "--role-user (:root)",
+        "tonalRamp": [
+          "#78350F",
+          "#92400E",
+          "#B45309",
+          "#D97706",
+          "#F59E0B",
+          "#FBBF24",
+          "#FCD34D",
+          "#FEF3C7"
+        ]
+      },
+      "role-user-bg": {
+        "role": "role",
+        "displayName": "User Tint",
+        "canonical": "rgb(46 34 8)",
+        "cssVariable": "--role-user-bg (.dark)",
+        "tonalRamp": [
+          "#78350F",
+          "#92400E",
+          "#B45309",
+          "#D97706",
+          "#F59E0B",
+          "#FBBF24",
+          "#FCD34D",
+          "#FEF3C7"
+        ]
+      },
+      "role-user-bg-light": {
+        "role": "role",
+        "displayName": "User Tint (light)",
+        "canonical": "rgb(254 243 199)",
+        "cssVariable": "--role-user-bg (:root)",
+        "tonalRamp": [
+          "#78350F",
+          "#92400E",
+          "#B45309",
+          "#D97706",
+          "#F59E0B",
+          "#FBBF24",
+          "#FCD34D",
+          "#FEF3C7"
+        ]
+      },
+      "chart-1": {
+        "role": "reserved",
+        "displayName": "Chart Indigo (reserved, unused)",
+        "canonical": "rgb(124 140 255)",
+        "cssVariable": "--chart-1 (.dark)",
+        "tonalRamp": [
+          "#232A6B",
+          "#323C99",
+          "#4F5BD5",
+          "#6372E8",
+          "#7C8CFF",
+          "#A3AEFF",
+          "#C8CFFF",
+          "#E8EBFF"
+        ]
+      },
+      "chart-1-light": {
+        "role": "reserved",
+        "displayName": "Chart Indigo (reserved, unused) (light)",
+        "canonical": "rgb(79 91 213)",
+        "cssVariable": "--chart-1 (:root)",
+        "tonalRamp": [
+          "#232A6B",
+          "#323C99",
+          "#4F5BD5",
+          "#6372E8",
+          "#7C8CFF",
+          "#A3AEFF",
+          "#C8CFFF",
+          "#E8EBFF"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "kpi": {
+        "displayName": "KPI",
+        "purpose": "The two KPI strip figures only (text-kpi)."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Page titles (text-lg, semibold)."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Dialog titles; touch-size input text on phones (text-md)."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Base size on body; dialog body (text-base)."
+      },
+      "body-dense": {
+        "displayName": "Body Dense",
+        "purpose": "Table cells, panel titles, buttons, inputs, tabs, descriptions (text-sm)."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Table headers, field labels, pills, small buttons, hints (text-xs). Sentence case."
+      }
+    },
+    "shadows": [
+      {
+        "name": "sidebar-overlay",
+        "value": "8px 0 32px rgb(0 0 0 / 0.18)",
+        "purpose": "Sidebar only while hover-expanded over content."
+      },
+      {
+        "name": "toast",
+        "value": "0 8px 24px rgb(0 0 0 / 0.18)",
+        "purpose": "Toasts."
+      },
+      {
+        "name": "dialog",
+        "value": "0 16px 48px rgb(0 0 0 / 0.28)",
+        "purpose": "Dialogs and phone sheets, over a black 50% (dark: 70%) scrim."
+      },
+      {
+        "name": "segmented-thumb-edge",
+        "value": "inset 0 0 0 1px rgb(var(--border-strong))",
+        "purpose": "Inset hairline on the selected segmented tab; not elevation."
+      },
+      {
+        "name": "focus-ring",
+        "value": "outline: 2px solid rgb(var(--fg) / 0.55); outline-offset: 2px",
+        "purpose": "Global :focus-visible."
+      },
+      {
+        "name": "input-focus",
+        "value": "0 0 0 2px rgb(var(--fg) / 0.1)",
+        "purpose": "Input focus ring (danger at 15% when invalid)."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Exponential ease-out for every tween, the sidebar width and the theme crossfade."
+      },
+      {
+        "name": "spring",
+        "value": "spring, stiffness 500, damping 40",
+        "purpose": "Layout moves: active nav pill, bottom-nav bar, segmented thumb, rows reflowing."
+      },
+      {
+        "name": "fade",
+        "value": "opacity, 180ms in / 120ms out",
+        "purpose": "Empty states, nav items, KPI values, scrim."
+      },
+      {
+        "name": "dialog",
+        "value": "opacity + scale 0.97 + y 6px; 240ms in / 140ms out",
+        "purpose": "Desktop dialog."
+      },
+      {
+        "name": "sheet",
+        "value": "y 100% to 0; 320ms in / 200ms out; drag-to-dismiss past 120px or 500px/s",
+        "purpose": "Phone bottom sheet."
+      },
+      {
+        "name": "list",
+        "value": "opacity 0.5 to 1 over 200ms; stagger 25ms; delay 20ms",
+        "purpose": "A result set arriving."
+      },
+      {
+        "name": "row",
+        "value": "in: opacity + y 4px, 220ms; out: opacity + x 24px, 180ms",
+        "purpose": "Rows entering; rows removed by approve, reject or remove."
+      },
+      {
+        "name": "page",
+        "value": "opacity + y 6px, 260ms",
+        "purpose": "Dashboard route content settling (app/dashboard/template.tsx)."
+      },
+      {
+        "name": "tab-switch",
+        "value": "opacity + x 12px in the direction of travel, 220ms; only after a user switch",
+        "purpose": "Pending / Approved panel change."
+      },
+      {
+        "name": "month-step",
+        "value": "label x 10px in the direction of travel; 200ms in / 120ms out",
+        "purpose": "Month stepper label."
+      },
+      {
+        "name": "number-tick",
+        "value": "500ms requestAnimationFrame tween, exponential ease-out; no count-up on first render",
+        "purpose": "KPI totals and tab counts during the approval hand-off."
+      },
+      {
+        "name": "sidebar",
+        "value": "width 64px to 232px over 240ms; hover intent 120ms open / 220ms close; labels fade in 200ms after 75ms, out in 100ms",
+        "purpose": "Sidebar expand and collapse."
+      },
+      {
+        "name": "refetch-dim",
+        "value": "opacity 0.6, 200ms",
+        "purpose": "Previous page shown while the next loads (keepPreviousData)."
+      },
+      {
+        "name": "theme-crossfade",
+        "value": "view transition on root, 240ms",
+        "purpose": "Whole-page theme switch."
+      },
+      {
+        "name": "press",
+        "value": "scale 0.98, 150ms",
+        "purpose": "Button press."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "MotionConfig reducedMotion=user; CSS animation and transition durations 0.01ms",
+        "purpose": "Transforms dropped, opacity kept; number ticks jump to the value."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px",
+        "purpose": "Tables switch between stacked rows and columns; dialogs are bottom sheets below it (PHONE_QUERY max-width 639px)."
+      },
+      {
+        "name": "md",
+        "value": "768px",
+        "purpose": "Sidebar on; phone top bar and bottom nav off."
+      },
+      {
+        "name": "lg",
+        "value": "1024px",
+        "purpose": "Page header on one row; row-level button labels shown."
+      }
+    ],
+    "layout": {
+      "contentMaxWidth": "1152px",
+      "railWidth": "64px",
+      "sidebarWidth": "232px",
+      "topBarHeight": "56px",
+      "bottomNavHeight": "56px",
+      "tableHeaderHeight": "36px",
+      "rowHeight": "40px",
+      "touchTarget": "44px"
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ink-filled action; one per view (submit collection, sign in, new user).",
+      "html": "<button class=\"ds-btn-primary\">Submit collection</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; padding: 0 14px; border: 0; border-radius: 6px; background: rgb(var(--fg)); color: rgb(var(--on-fg)); font: 500 0.8125rem/1.25rem var(--font-geist), ui-sans-serif, system-ui, sans-serif; cursor: pointer; transition: background-color 150ms, transform 150ms; } .ds-btn-primary:hover { background: rgb(var(--fg) / 0.85); } .ds-btn-primary:active { transform: scale(0.98); } .ds-btn-primary:focus-visible { outline: 2px solid rgb(var(--fg) / 0.55); outline-offset: 2px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Default button: cancel, pagination, neutral actions.",
+      "html": "<button class=\"ds-btn-secondary\">Cancel</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border: 1px solid rgb(var(--border-strong)); border-radius: 6px; background: rgb(var(--surface)); color: rgb(var(--fg)); font: 500 0.8125rem/1.25rem var(--font-geist), ui-sans-serif, system-ui, sans-serif; cursor: pointer; transition: background-color 150ms, transform 150ms; } .ds-btn-secondary:hover { background: rgb(var(--surface-2)); } .ds-btn-secondary:active { transform: scale(0.98); } .ds-btn-secondary:focus-visible { outline: 2px solid rgb(var(--fg) / 0.55); outline-offset: 2px; }"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Confirm button inside destructive dialogs only.",
+      "html": "<button class=\"ds-btn-danger\">Remove payment</button>",
+      "css": ".ds-btn-danger { display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border: 0; border-radius: 6px; background: rgb(var(--danger)); color: rgb(var(--bg)); font: 500 0.8125rem/1.25rem var(--font-geist), ui-sans-serif, system-ui, sans-serif; cursor: pointer; transition: background-color 150ms, transform 150ms; } .ds-btn-danger:hover { background: rgb(var(--danger) / 0.85); } .ds-btn-danger:active { transform: scale(0.98); } .ds-btn-danger:focus-visible { outline: 2px solid rgb(var(--fg) / 0.55); outline-offset: 2px; }"
+    },
+    {
+      "name": "Prefixed Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Labelled field with a fixed in-field prefix such as S- or PKR.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">House number</span><span class=\"ds-input-wrap\"><span class=\"ds-input-prefix\">S-</span><input class=\"ds-input\" placeholder=\"14\" inputmode=\"numeric\"></span></label>",
+      "css": ".ds-field { display: block; width: 160px; font-family: var(--font-geist), ui-sans-serif, system-ui, sans-serif; } .ds-field-label { display: block; margin-bottom: 6px; font-size: 0.75rem; line-height: 1rem; font-weight: 500; color: rgb(var(--fg-muted)); } .ds-input-wrap { position: relative; display: flex; align-items: center; } .ds-input-prefix { position: absolute; left: 12px; font-size: 0.8125rem; font-weight: 500; color: rgb(var(--fg-subtle)); pointer-events: none; } .ds-input { width: 100%; height: 36px; padding: 0 12px 0 32px; border: 1px solid rgb(var(--border-strong)); border-radius: 6px; background: rgb(var(--surface)); color: rgb(var(--fg)); font-size: 0.8125rem; outline: none; transition: border-color 150ms, box-shadow 150ms; } .ds-input::placeholder { color: rgb(var(--fg-subtle)); } .ds-input:hover { border-color: rgb(var(--fg) / 0.25); } .ds-input:focus { border-color: rgb(var(--fg) / 0.4); box-shadow: 0 0 0 2px rgb(var(--fg) / 0.1); }"
+    },
+    {
+      "name": "Status Pills",
+      "kind": "chip",
+      "refersTo": "pill-approved",
+      "description": "Green Approved, grey Pending approval; tint, dot and label together.",
+      "html": "<span class=\"ds-pill ds-pill-approved\"><i></i>Approved</span> <span class=\"ds-pill ds-pill-pending\"><i></i>Pending approval</span>",
+      "css": ".ds-pill { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 10px; border-radius: 9999px; font: 500 0.75rem/1rem var(--font-geist), ui-sans-serif, system-ui, sans-serif; white-space: nowrap; } .ds-pill i { width: 6px; height: 6px; border-radius: 9999px; background: currentColor; } .ds-pill-approved { color: rgb(var(--success)); background: rgb(var(--success-bg)); } .ds-pill-pending { color: rgb(var(--pending)); background: rgb(var(--pending-bg)); }"
+    },
+    {
+      "name": "Role Pills",
+      "kind": "chip",
+      "refersTo": "pill-role-admin",
+      "description": "Violet admin, sky collector, amber user.",
+      "html": "<span class=\"ds-role ds-role-admin\"><i></i>Admin</span> <span class=\"ds-role ds-role-collector\"><i></i>Collector</span> <span class=\"ds-role ds-role-user\"><i></i>User</span>",
+      "css": ".ds-role { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 10px; border-radius: 9999px; font: 500 0.75rem/1rem var(--font-geist), ui-sans-serif, system-ui, sans-serif; } .ds-role i { width: 6px; height: 6px; border-radius: 9999px; background: currentColor; } .ds-role-admin { color: rgb(var(--role-admin)); background: rgb(var(--role-admin-bg)); } .ds-role-collector { color: rgb(var(--role-collector)); background: rgb(var(--role-collector-bg)); } .ds-role-user { color: rgb(var(--role-user)); background: rgb(var(--role-user-bg)); }"
+    },
+    {
+      "name": "KPI Strip",
+      "kind": "card",
+      "refersTo": "kpi-cell",
+      "description": "One hairline panel split into two KPI cells; the delta line is neutral ink.",
+      "html": "<section class=\"ds-kpi\"><div class=\"ds-kpi-cell\"><span class=\"ds-kpi-label\">Approved in October</span><span class=\"ds-kpi-value\"><small>PKR</small>90,000</span><span class=\"ds-kpi-note\">So far, <b><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m7 7 10 10\"/><path d=\"M17 7v10H7\"/></svg>&minus;20%</b> vs all of September</span></div><button class=\"ds-kpi-cell ds-kpi-button\"><span class=\"ds-kpi-label\">Awaiting approval</span><span class=\"ds-kpi-value\"><small>PKR</small>0</span><span class=\"ds-kpi-note\">All caught up</span></button></section>",
+      "css": ".ds-kpi { display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; border: 1px solid rgb(var(--border)); border-radius: 8px; background: rgb(var(--surface)); font-family: var(--font-geist), ui-sans-serif, system-ui, sans-serif; font-feature-settings: \"tnum\" 1; } .ds-kpi-cell { display: block; padding: 16px 20px; text-align: left; } .ds-kpi-button { border: 0; border-left: 1px solid rgb(var(--border)); background: none; color: inherit; font: inherit; cursor: pointer; transition: background-color 150ms; } .ds-kpi-button:hover { background: rgb(var(--surface-2) / 0.4); } .ds-kpi-button:focus-visible { outline: 2px solid rgb(var(--fg) / 0.55); outline-offset: -2px; } .ds-kpi-label { display: block; font-size: 0.8125rem; color: rgb(var(--fg-muted)); } .ds-kpi-value { display: flex; align-items: baseline; gap: 8px; margin-top: 6px; font-size: 1.75rem; line-height: 2.125rem; font-weight: 600; letter-spacing: -0.025em; color: rgb(var(--fg)); } .ds-kpi-value small { font-size: 0.8125rem; font-weight: 500; letter-spacing: 0; color: rgb(var(--fg-subtle)); } .ds-kpi-note { display: flex; align-items: center; gap: 4px; min-height: 20px; margin-top: 4px; font-size: 0.75rem; color: rgb(var(--fg-muted)); } .ds-kpi-note b { display: inline-flex; align-items: center; font-weight: 500; color: rgb(var(--fg)); }"
+    },
+    {
+      "name": "Segmented Tabs",
+      "kind": "custom",
+      "refersTo": "segmented-tabs",
+      "description": "Pending | Approved tabs: a ground well with a raised, hairline-edged thumb and counts.",
+      "html": "<div class=\"ds-seg\" role=\"tablist\"><button class=\"ds-seg-tab is-selected\" role=\"tab\" aria-selected=\"true\">Pending <span>4</span></button><button class=\"ds-seg-tab\" role=\"tab\" aria-selected=\"false\">Approved <span>18</span></button></div>",
+      "css": ".ds-seg { display: inline-flex; gap: 2px; height: 32px; padding: 2px; border: 1px solid rgb(var(--border)); border-radius: 6px; background: rgb(var(--bg)); font-family: var(--font-geist), ui-sans-serif, system-ui, sans-serif; } .ds-seg-tab { display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; border: 0; border-radius: 5px; background: none; font-size: 0.8125rem; font-weight: 500; color: rgb(var(--fg-muted)); cursor: pointer; transition: color 150ms, background-color 150ms; } .ds-seg-tab:hover { color: rgb(var(--fg)); } .ds-seg-tab span { font-size: 0.75rem; color: rgb(var(--fg-subtle)); font-variant-numeric: tabular-nums; } .ds-seg-tab.is-selected { color: rgb(var(--fg)); background: rgb(var(--surface-2)); box-shadow: inset 0 0 0 1px rgb(var(--border-strong)); } .ds-seg-tab:focus-visible { outline: 2px solid rgb(var(--fg) / 0.55); outline-offset: 2px; }"
+    },
+    {
+      "name": "Ledger Table",
+      "kind": "custom",
+      "refersTo": "table-row",
+      "description": "Dense table: identifiers left, time and pills centred, amounts and actions right.",
+      "html": "<table class=\"ds-table\"><thead><tr><th>House</th><th>Collector</th><th class=\"c\">Submitted</th><th class=\"c\">Status</th><th class=\"r\">Amount</th></tr></thead><tbody><tr><td class=\"strong\">S-14</td><td class=\"muted\">Falak</td><td class=\"c muted\">1d ago</td><td class=\"c\"><span class=\"ds-table-pill\"><i></i>Approved</span></td><td class=\"r strong\">PKR 5,000</td></tr><tr><td class=\"strong\">S-21</td><td class=\"muted\">Falak</td><td class=\"c muted\">18h ago</td><td class=\"c\"><span class=\"ds-table-pill\"><i></i>Approved</span></td><td class=\"r strong\">PKR 5,000</td></tr></tbody></table>",
+      "css": ".ds-table { width: 100%; border-collapse: collapse; background: rgb(var(--surface)); color: rgb(var(--fg)); font: 400 0.8125rem/1.25rem var(--font-geist), ui-sans-serif, system-ui, sans-serif; font-feature-settings: \"tnum\" 1; } .ds-table thead tr { border-bottom: 1px solid rgb(var(--border)); background: rgb(var(--surface-2) / 0.5); } .ds-table th { height: 36px; padding: 0 16px; text-align: left; font-size: 0.75rem; font-weight: 500; color: rgb(var(--fg-subtle)); } .ds-table td { height: 40px; padding: 0 16px; } .ds-table tbody tr { border-bottom: 1px solid rgb(var(--border)); transition: background-color 150ms; } .ds-table tbody tr:last-child { border-bottom: 0; } .ds-table tbody tr:hover { background: rgb(var(--surface-2) / 0.4); } .ds-table .c { text-align: center; } .ds-table .r { text-align: right; } .ds-table .strong { font-weight: 500; } .ds-table .muted { color: rgb(var(--fg-muted)); } .ds-table-pill { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; color: rgb(var(--success)); background: rgb(var(--success-bg)); } .ds-table-pill i { width: 6px; height: 6px; border-radius: 9999px; background: currentColor; }"
+    },
+    {
+      "name": "Sidebar Nav",
+      "kind": "nav",
+      "refersTo": "sidebar-expanded",
+      "description": "Surface sidebar with a hairline edge; the active item sits on a raised pill.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-item is-active\" href=\"#\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3\" y=\"3\" width=\"7\" height=\"9\" rx=\"1\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"5\" rx=\"1\"/><rect x=\"14\" y=\"12\" width=\"7\" height=\"9\" rx=\"1\"/><rect x=\"3\" y=\"16\" width=\"7\" height=\"5\" rx=\"1\"/></svg>Overview</a><a class=\"ds-nav-item\" href=\"#\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M22 21v-2a4 4 0 0 0-3-3.87\"/><path d=\"M16 3.13a4 4 0 0 1 0 7.75\"/></svg>Users</a></nav>",
+      "css": ".ds-nav { width: 232px; padding: 8px 16px; border-right: 1px solid rgb(var(--border)); background: rgb(var(--surface)); font-family: var(--font-geist), ui-sans-serif, system-ui, sans-serif; } .ds-nav-item { display: flex; align-items: center; gap: 10px; height: 32px; margin-bottom: 2px; padding: 0 8px; border-radius: 6px; font-size: 0.8125rem; font-weight: 500; color: rgb(var(--fg-muted)); text-decoration: none; transition: background-color 150ms, color 150ms; } .ds-nav-item:hover { background: rgb(var(--surface-2) / 0.6); color: rgb(var(--fg)); } .ds-nav-item.is-active { background: rgb(var(--surface-2)); color: rgb(var(--fg)); } .ds-nav-item:focus-visible { outline: 2px solid rgb(var(--fg) / 0.55); outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Quiet Ledger",
+    "overview": "The Collector is a monochrome ledger for a housing society's monthly dues. Everything is ink on a near-black ground (light theme: ink on near-white), drawn in hairlines, set in Geist with tabular figures so every column of rupees lines up. There is no brand accent. Colour appears only when it has a job: a payment's status, a person's role, a destructive action. The absence of colour is the brand; when green shows up, it means money has been approved.\n\nDensity is deliberate. Rows are 40px, body copy is 13-14px, panels sit edge to edge with 16px between them, and the KPI strip is one bordered panel split by a hairline rather than a grid of floating cards. The page reads like a ruled book: a title, a toolbar, a strip of two totals, and the queue.\n\nMotion exists to show state changing, never to decorate. The system's signature is the approval hand-off: an approved row slides out of the Pending queue, the remaining rows glide up, the Pending count ticks down, and the month's Approved total ticks up. Every motion preset in the build serves that kind of change (selection, rows entering or leaving, dialogs, numbers moving, views switching).",
+    "keyCharacteristics": [
+      "Monochrome ink-on-ground with no brand accent; both themes driven by the same RGB-triplet tokens.",
+      "Hairline-bordered panels as the single container; tonal steps instead of shadows at rest.",
+      "Geist throughout, tabular figures on by default, houses always `S-<n>`, amounts always `PKR 5,000`.",
+      "Colour reserved for jobs: status, role, destruction.",
+      "Dense, left-anchored tables that become stacked rows on phones.",
+      "Motion that only reports state change, with exponential ease-out and faster exits than entrances."
+    ],
+    "rules": [
+      {
+        "name": "The Colour-Has-A-Job Rule",
+        "body": "Every coloured pixel is a status, a role or a destructive action. There is no brand accent, no decorative tint, no raw Tailwind palette; components use only the token classes.",
+        "section": "colors"
+      },
+      {
+        "name": "The Green Means Approved Rule",
+        "body": "Green is reserved for Approved and grey for Pending. Nothing else may borrow either, including trend indicators: the month-over-month delta is written in neutral ink, with direction carried by an arrow and a sign.",
+        "section": "colors"
+      },
+      {
+        "name": "The Never-Colour-Alone Rule",
+        "body": "Every pill pairs its tint with a dot and a text label; colour is never the only carrier of status or role.",
+        "section": "colors"
+      },
+      {
+        "name": "The Reserved Indigo Rule",
+        "body": "`chart-1` belongs to future charts. Do not spend it on UI chrome.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Ledger Rule",
+        "body": "Figures are tabular everywhere; numeric columns, counts and KPIs also carry `tabular-nums` explicitly so the alignment survives any override.",
+        "section": "typography"
+      },
+      {
+        "name": "The Fixed Formats Rule",
+        "body": "Houses are rendered `S-<n>` and amounts `PKR 5,000` through the shared formatters; never inline either format.",
+        "section": "typography"
+      },
+      {
+        "name": "The Ledger Alignment Rule",
+        "body": "Identifiers and names read left; short fixed-width tokens (relative time, status and role pills) sit centred; amounts and row actions sit right. Tables never centre text columns.",
+        "section": "layout"
+      },
+      {
+        "name": "The No Sideways Scroll Rule",
+        "body": "On phones a table row becomes a stacked mini-row (identifier and status top-left, amount top-right, secondary detail and actions below), never a horizontally scrolling table.",
+        "section": "layout"
+      },
+      {
+        "name": "The Flat-By-Default Rule",
+        "body": "Panels, cards, buttons and inputs carry no shadow. A shadow means \"this layer is temporarily above the page\".",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do use only the token colours (`bg`, `surface`, `fg`, `border`, `success`, `pending`, `danger`, `role-*`) and define every new token for both `:root` and `.dark` as RGB triplets.",
+      "Do keep green for Approved and grey for Pending; write trends and deltas in neutral ink with an arrow and a sign.",
+      "Do use violet for admin, sky for collector and amber for user, and only inside the role pill.",
+      "Do spend one ink-filled primary button per view; everything else is secondary or ghost.",
+      "Do put content in panels (8px radius, hairline border, surface fill) and keep panels one level deep.",
+      "Do align identifiers and names left, relative times and pills centre, amounts and row actions right.",
+      "Do use the shared motion presets: exponential ease-out `cubic-bezier(0.16, 1, 0.3, 1)`, the 500/40 spring for layout moves, exits faster than entrances, and reduced motion honoured.",
+      "Do show loading with skeletons shaped like the content, and write empty states that say what will appear and what to do.",
+      "Do keep collector inputs and submit buttons at 44px on phones."
+    ],
+    "donts": [
+      "Don't introduce a brand accent or use raw Tailwind palettes (zinc, blue, etc.).",
+      "Don't use green, grey-pill styling or role colours for anything other than status and role.",
+      "Don't use danger red outside destructive actions and invalid input.",
+      "Don't use `chart-1` until the charts ship.",
+      "Don't nest panels or build floating KPI cards; the KPI strip is one panel split by a hairline.",
+      "Don't centre text columns in tables or let tables scroll sideways on phones.",
+      "Don't animate for decoration: no count-up on page load, no ambient loops, no entrance flourishes beyond the route settle.",
+      "Don't add shadows to resting surfaces.",
+      "Don't convey status or role by colour alone."
+    ]
+  }
+}

@@ -20,7 +20,7 @@ os.environ.setdefault("DATABASE_URL", TEST_DATABASE_URL or "postgresql+asyncpg:/
 os.environ.setdefault("JWT_SECRET", "test-secret")
 os.environ.setdefault("JWT_EXPIRE_MINUTES", "60")
 os.environ.setdefault("ADMIN_NAME", "Admin")
-os.environ.setdefault("ADMIN_EMAIL", "admin@test.local")
+os.environ.setdefault("ADMIN_EMAIL", "admin@example.com")
 os.environ.setdefault("ADMIN_PASSWORD", "admin-pass-123")
 
 pytestmark = pytest.mark.skipif(
@@ -74,7 +74,7 @@ if TEST_DATABASE_URL:
     async def seeded_admin(db_session):
         admin = User(
             name="Admin",
-            email="admin@test.local",
+            email="admin@example.com",
             password=hash_password("admin-pass-123"),
             role="admin",
         )
@@ -94,7 +94,7 @@ if TEST_DATABASE_URL:
     async def admin_token(client, seeded_admin):
         resp = await client.post(
             "/api/v1/auth/login",
-            json={"email": "admin@test.local", "password": "admin-pass-123"},
+            json={"email": "admin@example.com", "password": "admin-pass-123"},
         )
         assert resp.status_code == 200
         return resp.json()["access_token"]

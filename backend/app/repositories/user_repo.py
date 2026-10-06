@@ -26,6 +26,16 @@ class UserRepository:
         await self.db.refresh(user)
         return user
 
+    async def set_password(self, user: User, hashed: str) -> User:
+        user.password = hashed
+        await self.db.flush()
+        await self.db.refresh(user)
+        return user
+
+    async def delete(self, user: User) -> None:
+        await self.db.delete(user)
+        await self.db.flush()
+
     async def list(self, *, offset: int, limit: int) -> tuple[list[User], int]:
         total = await self.db.scalar(select(func.count()).select_from(User)) or 0
         result = await self.db.execute(

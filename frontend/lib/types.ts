@@ -1,4 +1,4 @@
-export type Role = "user" | "admin";
+export type Role = "user" | "admin" | "collector";
 
 export interface User {
   id: string;
@@ -15,6 +15,7 @@ export interface Collection {
   house_number: number;
   amount: number;
   approved: boolean;
+  collector_name: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -32,3 +33,6 @@ export interface Page<T> {
 }
 
 export const COOKIE_NAME = "access_token";
+
+/** Desktop sidebar pinned open ("1") or collapsed to the rail. Read server-side to avoid a layout shift. */
+export const PIN_COOKIE = "sidebar-pinned";

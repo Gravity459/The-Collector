@@ -2,28 +2,146 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-  -webkit-tap-highlight-color: transparent;
+/* Design tokens as RGB triplets so Tailwind opacity modifiers work.
+   Light on :root, dark on .dark (class set before hydration in app/layout.tsx). */
+:root {
+  --bg: 250 250 250;
+  --surface: 255 255 255;
+  --surface-2: 244 244 245;
+  --border: 228 228 231;
+  --border-strong: 212 212 216;
+  --fg: 10 10 10;
+  --fg-muted: 82 82 91;
+  --fg-subtle: 113 113 122;
+  --on-fg: 255 255 255;
+
+  --success: 21 128 61;
+  --success-bg: 220 252 231;
+  --pending: 82 82 91;
+  --pending-bg: 244 244 245;
+  --danger: 220 38 38;
+  --danger-bg: 254 226 226;
+
+  --role-admin: 109 40 217;
+  --role-admin-bg: 237 233 254;
+  --role-collector: 3 105 161;
+  --role-collector-bg: 224 242 254;
+  --role-user: 180 83 9;
+  --role-user-bg: 254 243 199;
+
+  --chart-1: 79 91 213;
+
+  color-scheme: light;
 }
 
-body {
-  @apply bg-zinc-50 text-zinc-900 antialiased;
+.dark {
+  --bg: 10 10 10;
+  --surface: 15 15 15;
+  --surface-2: 28 28 28;
+  --border: 38 38 38;
+  --border-strong: 51 51 51;
+  --fg: 237 237 237;
+  --fg-muted: 161 161 161;
+  --fg-subtle: 138 138 138;
+  --on-fg: 10 10 10;
+
+  --success: 74 222 128;
+  --success-bg: 14 42 28;
+  --pending: 161 161 161;
+  --pending-bg: 28 28 28;
+  --danger: 248 113 113;
+  --danger-bg: 42 15 15;
+
+  --role-admin: 196 181 253;
+  --role-admin-bg: 42 33 64;
+  --role-collector: 125 211 252;
+  --role-collector-bg: 12 42 58;
+  --role-user: 252 211 77;
+  --role-user-bg: 46 34 8;
+
+  --chart-1: 124 140 255;
+
+  color-scheme: dark;
 }
 
-.dark body {
-  @apply bg-zinc-950 text-zinc-100;
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    /* reserve the scrollbar's space so pages, tabs and dialogs never shift sideways */
+    scrollbar-gutter: stable;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    @apply bg-bg font-sans text-base text-fg antialiased;
+    font-feature-settings: "tnum" 1, "cv11" 1;
+  }
+
+  ::selection {
+    background: rgb(var(--fg) / 0.18);
+  }
+
+  input,
+  textarea {
+    caret-color: rgb(var(--fg));
+  }
+
+  :focus-visible {
+    outline: 2px solid rgb(var(--fg) / 0.55);
+    outline-offset: 2px;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--border-strong)) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: rgb(var(--border-strong));
+    border-radius: 9999px;
+  }
+
+  /* Hide number-input spinners: amounts and house numbers are typed. */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
 }
 
-/* Custom scrollbar for a cleaner look */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgb(161 161 170 / 0.4) transparent;
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
 }
-*::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+
+/* Theme switch: one crossfade of the whole page (View Transitions) instead of
+   every element's colour transition firing separately. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 240ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
-*::-webkit-scrollbar-thumb {
-  background-color: rgb(161 161 170 / 0.4);
-  border-radius: 9999px;
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

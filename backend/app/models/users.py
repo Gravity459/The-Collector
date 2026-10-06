@@ -6,13 +6,15 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base, TimestampMixin, UUIDMixin
 
-ROLES = ("user", "admin")
+ROLES = ("user", "admin", "collector")
 
 
 class User(UUIDMixin, TimestampMixin, Base):
     __tablename__ = "users"
     __table_args__ = (
-        CheckConstraint("role in ('user', 'admin')", name="ck_users_role"),
+        CheckConstraint(
+            "role in ('user', 'admin', 'collector')", name="ck_users_role"
+        ),
     )
 
     name: Mapped[str] = mapped_column(String(255), nullable=False)

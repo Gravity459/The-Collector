@@ -12,6 +12,13 @@ from app.models.collection import Collection
 from app.models.houses import House
 
 
+def _in_month(month: str):
+    """Rows whose created_at falls in `month` ("YYYY-MM"), computed server-side."""
+    return func.date_trunc("month", Collection.created_at) == func.to_timestamp(
+        month, "YYYY-MM"
+    )
+
+
 class CollectionRepository:
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
@@ -19,7 +26,7 @@ class CollectionRepository:
     async def get_by_id(self, collection_id: uuid.UUID) -> Collection | None:
         result = await self.db.execute(
             select(Collection)
-            .options(joinedload(Collection.house))
+            .options(joinedload(Collection.house), joinedload(Collection.collector))
             .where(Collection.id == collection_id)
         )
         return result.scalar_one_or_none()
@@ -33,16 +40,31 @@ class CollectionRepository:
         )
         return bool(result)
 
-    async def sum_current_month(self) -> int:
-        result = await self.db.scalar(
-            select(func.coalesce(func.sum(Collection.amount), 0))
-            .where(Collection.approved.is_(True))
-            .where(Collection.created_at >= func.date_trunc("month", func.now()))
+    async def sum_amount(
+        self,
+        *,
+        approved: bool,
+        month: str | None = None,
+        all_months: bool = False,
+    ) -> int:
+        stmt = select(func.coalesce(func.sum(Collection.amount), 0)).where(
+            Collection.approved.is_(approved)
         )
+        if month is not None:
+            stmt = stmt.where(_in_month(month))
+        elif not all_months:
+            stmt = stmt.where(
+                Collection.created_at >= func.date_trunc("month", func.now())
+            )
+        result = await self.db.scalar(stmt)
         return int(result or 0)
 
-    async def create(self, *, house_id: uuid.UUID, amount: int) -> Collection:
-        collection = Collection(house_id=house_id, amount=amount, approved=False)
+    async def create(
+        self, *, house_id: uuid.UUID, amount: int, collector_id: uuid.UUID
+    ) -> Collection:
+        collection = Collection(
+            house_id=house_id, amount=amount, collector_id=collector_id, approved=False
+        )
         self.db.add(collection)
         await self.db.flush()
         # reload with house relationship for serialization
@@ -67,6 +89,7 @@ class CollectionRepository:
         house_number: int | None = None,
         approved: bool | None = None,
         current_month_only: bool = False,
+        month: str | None = None,
     ) -> tuple[list[Collection], int]:
         base = select(Collection).join(House, Collection.house_id == House.id)
 
@@ -78,14 +101,16 @@ class CollectionRepository:
             base = base.where(
                 Collection.created_at >= func.date_trunc("month", func.now())
             )
+        if month is not None:
+            base = base.where(_in_month(month))
 
         total = await self.db.scalar(
             select(func.count()).select_from(base.subquery())
         ) or 0
 
         result = await self.db.execute(
-            base.options(joinedload(Collection.house))
-            .order_by(Collection.created_at.desc())
+            base.options(joinedload(Collection.house), joinedload(Collection.collector))
+            .order_by(House.house_number.asc(), Collection.created_at.desc())
             .offset(offset)
             .limit(limit)
         )

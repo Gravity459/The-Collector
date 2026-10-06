@@ -21,6 +21,7 @@ def _to_out(c: Collection) -> CollectionOut:
         house_number=c.house.house_number,
         amount=c.amount,
         approved=c.approved,
+        collector_name=c.collector.name if c.collector else None,
         created_at=c.created_at,
         updated_at=c.updated_at,
     )
@@ -31,7 +32,9 @@ class CollectionService:
         self.collections = CollectionRepository(db)
         self.houses = HouseRepository(db)
 
-    async def submit(self, data: CollectionCreate) -> CollectionOut:
+    async def submit(
+        self, data: CollectionCreate, *, collector_id: uuid.UUID
+    ) -> CollectionOut:
         house = await self.houses.get_or_create(data.house_number)
         if await self.collections.exists_current_month(house.id):
             raise HTTPException(
@@ -41,7 +44,9 @@ class CollectionService:
                     "for this month."
                 ),
             )
-        created = await self.collections.create(house_id=house.id, amount=data.amount)
+        created = await self.collections.create(
+            house_id=house.id, amount=data.amount, collector_id=collector_id
+        )
         return _to_out(created)
 
     async def approve(self, collection_id: uuid.UUID) -> CollectionOut:
@@ -66,8 +71,13 @@ class CollectionService:
             )
         await self.collections.delete(collection)
 
-    async def current_month_total(self) -> CollectionTotal:
-        total = await self.collections.sum_current_month()
+    async def total(
+        self, *, approved: bool = True, month: str | None = None
+    ) -> CollectionTotal:
+        # approved: one month (default current); pending: all-time, like the list
+        total = await self.collections.sum_amount(
+            approved=approved, month=month, all_months=not approved
+        )
         return CollectionTotal(total=total)
 
     async def list(
@@ -77,6 +87,7 @@ class CollectionService:
         house_number: int | None = None,
         approved: bool | None = None,
         current_month_only: bool = False,
+        month: str | None = None,
     ) -> Page[CollectionOut]:
         rows, total = await self.collections.list(
             offset=params.offset,
@@ -84,6 +95,7 @@ class CollectionService:
             house_number=house_number,
             approved=approved,
             current_month_only=current_month_only,
+            month=month,
         )
         items = [_to_out(c) for c in rows]
         return build_page(items, total=total, page=params.page, size=params.size)

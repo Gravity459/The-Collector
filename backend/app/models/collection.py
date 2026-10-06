@@ -19,9 +19,16 @@ class Collection(UUIDMixin, TimestampMixin, Base):
         nullable=False,
         index=True,
     )
+    collector_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
     amount: Mapped[int] = mapped_column(Integer, nullable=False)
     approved: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=False, server_default="false", index=True
     )
 
     house: Mapped["House"] = relationship(back_populates="collections")  # noqa: F821
+    collector: Mapped["User | None"] = relationship()  # noqa: F821

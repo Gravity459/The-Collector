@@ -1,57 +1,60 @@
 "use client";
 
-import { useState } from "react";
+import { X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+
+import { Button } from "./ui/Button";
+import { Input } from "./ui/Input";
 
 interface Props {
   value: number | null;
   onChange: (houseNumber: number | null) => void;
 }
 
+/** "S-" prefixed house search. Applies 300ms after typing stops. */
 export function HouseFilter({ value, onChange }: Props) {
   const [draft, setDraft] = useState<string>(value != null ? String(value) : "");
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+  const applied = useRef(value);
 
-  function apply() {
+  useEffect(() => {
     const trimmed = draft.trim();
-    onChange(trimmed === "" ? null : Number(trimmed));
-  }
-
-  const input =
-    "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-accent focus:ring-2 focus:ring-accent/30 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100";
+    const next = trimmed === "" ? null : Number(trimmed);
+    if (next !== null && (!Number.isInteger(next) || next < 1)) return;
+    if (next === applied.current) return;
+    const t = setTimeout(() => {
+      applied.current = next;
+      onChangeRef.current(next);
+    }, 300);
+    return () => clearTimeout(t);
+  }, [draft]);
 
   return (
-    <div className="flex w-full flex-wrap items-end gap-2 sm:w-auto">
-      <div className="flex-1 sm:flex-none">
-        <label className="mb-1 block text-xs font-medium text-zinc-500 dark:text-zinc-400">
-          House number
-        </label>
-        <input
-          type="number"
-          inputMode="numeric"
-          min={1}
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && apply()}
-          placeholder="All"
-          className={`${input} sm:w-32`}
-        />
-      </div>
-      <button
-        onClick={apply}
-        className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-hover"
-      >
-        Filter
-      </button>
-      {value != null && (
-        <button
-          onClick={() => {
-            setDraft("");
-            onChange(null);
-          }}
-          className="rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-600 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
-        >
-          Clear
-        </button>
-      )}
-    </div>
+    <Input
+      type="number"
+      inputMode="numeric"
+      min={1}
+      aria-label="Filter by house number"
+      placeholder="All houses"
+      prefix="S-"
+      value={draft}
+      onChange={(e) => setDraft(e.target.value)}
+      className="w-full sm:w-40"
+      trailing={
+        draft !== "" ? (
+          <Button
+            key="clear"
+            variant="ghost"
+            size="icon-sm"
+            aria-label="Clear house filter"
+            className="!h-6 !w-6 motion-safe:animate-[pop-in_150ms_cubic-bezier(0.16,1,0.3,1)]"
+            onClick={() => setDraft("")}
+          >
+            <X className="h-3.5 w-3.5" aria-hidden />
+          </Button>
+        ) : undefined
+      }
+    />
   );
 }

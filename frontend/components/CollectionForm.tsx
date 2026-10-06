@@ -1,82 +1,97 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { CURRENCY } from "@/lib/format";
 import { useCreateCollection } from "@/lib/queries";
 
+import { Button } from "./ui/Button";
+import { Field } from "./ui/Field";
+import { Input } from "./ui/Input";
+import { Panel } from "./ui/Panel";
+
 const schema = z.object({
-  house_number: z.coerce.number().int().positive("Enter a house number"),
-  amount: z.coerce.number().int().positive("Enter an amount"),
+  house_number: z.coerce
+    .number({ invalid_type_error: "Enter the house number" })
+    .int("Use a whole number")
+    .positive("Enter the house number"),
+  amount: z.coerce
+    .number({ invalid_type_error: "Enter the amount" })
+    .int("Use a whole amount")
+    .positive("Enter the amount"),
 });
 
 type FormValues = z.infer<typeof schema>;
 
+/**
+ * Inline entry form: logging a collection is the collector's main job, so it
+ * is always on screen. After each submit the fields clear and focus returns
+ * to the house number, ready for the next door.
+ */
 export function CollectionForm() {
   const create = useCreateCollection();
   const {
     register,
     handleSubmit,
     reset,
+    setFocus,
     formState: { errors },
   } = useForm<FormValues>({ resolver: zodResolver(schema) });
 
   function onSubmit(values: FormValues) {
-    create.mutate(values, { onSuccess: () => reset() });
+    create.mutate(values, {
+      onSuccess: () => {
+        reset();
+        setFocus("house_number");
+      },
+    });
   }
 
-  const input =
-    "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-accent focus:ring-2 focus:ring-accent/30 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100";
-
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm sm:p-5 dark:border-zinc-800 dark:bg-zinc-900"
-    >
-      <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+    <Panel aria-labelledby="new-collection-title" className="p-4 sm:p-5">
+      <h2 id="new-collection-title" className="text-sm font-medium text-fg">
         New collection
       </h2>
-      <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-end">
-        <div className="w-full sm:w-40">
-          <label className="mb-1 block text-xs font-medium text-zinc-500 dark:text-zinc-400">
-            House number
-          </label>
-          <input type="number" min={1} {...register("house_number")} className={input} />
-          {errors.house_number && (
-            <p className="mt-1 text-xs text-red-600 dark:text-red-400">
-              {errors.house_number.message}
-            </p>
-          )}
-        </div>
-        <div className="w-full sm:w-40">
-          <label className="mb-1 block text-xs font-medium text-zinc-500 dark:text-zinc-400">
-            Amount
-          </label>
-          <input type="number" min={1} {...register("amount")} className={input} />
-          {errors.amount && (
-            <p className="mt-1 text-xs text-red-600 dark:text-red-400">
-              {errors.amount.message}
-            </p>
-          )}
-        </div>
-        <button
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate
+        className="mt-3 grid grid-cols-2 gap-3 sm:flex sm:items-start"
+      >
+        <Field label="House number" error={errors.house_number?.message} className="sm:w-40">
+          <Input
+            type="number"
+            inputMode="numeric"
+            min={1}
+            prefix="S-"
+            placeholder="14"
+            touch
+            autoComplete="off"
+            {...register("house_number")}
+          />
+        </Field>
+        <Field label="Amount" error={errors.amount?.message} className="sm:w-44">
+          <Input
+            type="number"
+            inputMode="numeric"
+            min={1}
+            prefix={CURRENCY}
+            placeholder="5000"
+            touch
+            autoComplete="off"
+            {...register("amount")}
+          />
+        </Field>
+        <Button
           type="submit"
-          disabled={create.isPending}
-          className="w-full rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-hover disabled:opacity-60 sm:w-auto"
+          variant="primary"
+          loading={create.isPending}
+          className="col-span-2 h-11 sm:mt-[22px] sm:h-9"
         >
-          {create.isPending ? "Submitting…" : "Submit collection"}
-        </button>
-      </div>
-      {create.isError && (
-        <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-500/10 dark:text-red-400">
-          {axios.isAxiosError(create.error) &&
-          create.error.response?.data?.detail
-            ? create.error.response.data.detail
-            : "Could not submit. Please try again."}
-        </p>
-      )}
-    </form>
+          Submit collection
+        </Button>
+      </form>
+    </Panel>
   );
 }

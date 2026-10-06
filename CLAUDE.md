@@ -34,6 +34,7 @@ Monorepo: `backend/` (FastAPI) + `frontend/` (Next.js). Postgres on Supabase.
 - CORS allowlist = Vercel origin only.
 
 ## Roles
-Two roles only: `user`, `admin`.
-- `user`: submits collections, sees own current-month rows.
-- `admin`: creates users, approves collections, sees all rows.
+Three roles: `collector`, `user`, `admin`.
+- `collector`: the only role that submits collections (stamped as `collection.collector_id`); sees current-month rows.
+- `user`: read-only; sees approved payments only, filtered by house and month.
+- `admin`: manages users (create, change password, remove), approves collections, sees all rows.

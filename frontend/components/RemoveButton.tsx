@@ -1,52 +1,44 @@
 "use client";
 
+import { Trash2 } from "lucide-react";
 import { useState } from "react";
 
+import { houseLabel } from "@/lib/format";
 import { useDeleteCollection } from "@/lib/queries";
+import type { Collection } from "@/lib/types";
 
 import { ConfirmModal } from "./ConfirmModal";
+import { Button } from "./ui/Button";
 
-export function RemoveButton({
-  id,
-  houseNumber,
-}: {
-  id: string;
-  houseNumber: number;
-}) {
+export function RemoveButton({ collection }: { collection: Collection }) {
   const [open, setOpen] = useState(false);
   const remove = useDeleteCollection();
+  const house = houseLabel(collection.house_number);
 
   function confirm() {
-    remove.mutate(id, { onSuccess: () => setOpen(false) });
+    // optimistic: the row leaves the table as soon as the dialog closes
+    setOpen(false);
+    remove.mutate({ collection, successMessage: `Payment for ${house} removed` });
   }
 
   return (
     <>
-      <button
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        aria-label={`Remove payment for ${house}`}
+        title="Remove"
+        className="hover:!bg-danger-bg hover:!text-danger"
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-50 dark:border-red-500/30 dark:text-red-400 dark:hover:bg-red-500/10"
       >
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
-        </svg>
-        Remove
-      </button>
+        <Trash2 className="h-4 w-4" aria-hidden />
+      </Button>
 
       <ConfirmModal
         open={open}
-        title="Remove approved payment"
-        message={`This will permanently remove the approved payment for house S-${houseNumber}. This action cannot be undone.`}
-        confirmLabel="Remove"
-        loading={remove.isPending}
+        title={`Remove ${house}'s payment?`}
+        message={`The approved payment for ${house} will be deleted and taken out of the month's total. This can't be undone.`}
+        confirmLabel="Remove payment"
         onConfirm={confirm}
         onCancel={() => setOpen(false)}
       />

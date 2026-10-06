@@ -1,23 +1,28 @@
 "use client";
 
+import * as m from "motion/react-m";
+
 import { AdminView } from "@/components/AdminView";
-import { Spinner } from "@/components/Spinner";
+import { PageSkeleton } from "@/components/PageSkeleton";
 import { UserView } from "@/components/UserView";
+import { fadeIn } from "@/lib/motion";
 import { useMe } from "@/lib/queries";
 
 export default function OverviewPage() {
   const { data: me, isLoading, isError } = useMe();
 
-  if (isLoading) {
-    return <Spinner size="lg" label="Loading…" center />;
-  }
+  if (isLoading) return <PageSkeleton />;
   if (isError || !me) {
     return (
-      <p className="text-sm text-red-600 dark:text-red-400">
-        Could not load your profile. Try signing in again.
+      <p role="alert" className="text-sm text-danger">
+        Your profile couldn&apos;t be loaded. Sign out and sign in again.
       </p>
     );
   }
 
-  return me.role === "admin" ? <AdminView /> : <UserView />;
+  return (
+    <m.div variants={fadeIn} initial="initial" animate="animate">
+      {me.role === "admin" ? <AdminView /> : <UserView role={me.role} />}
+    </m.div>
+  );
 }

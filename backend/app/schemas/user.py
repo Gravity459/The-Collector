@@ -12,7 +12,11 @@ class UserCreate(BaseModel):
     name: str = Field(min_length=1, max_length=255)
     email: EmailStr
     password: str = Field(min_length=8, max_length=128)
-    role: Literal["user", "admin"] = "user"
+    role: Literal["user", "admin", "collector"] = "user"
+
+
+class UserPasswordUpdate(BaseModel):
+    password: str = Field(min_length=8, max_length=128)
 
 
 class UserOut(BaseModel):

@@ -1,60 +1,105 @@
 "use client";
 
+import { Inbox, ReceiptText } from "lucide-react";
 import { useState } from "react";
 
+import { currentMonth, formatMonth, formatMonthName } from "@/lib/format";
 import { useCollections } from "@/lib/queries";
+import type { Role } from "@/lib/types";
 
 import { CollectionForm } from "./CollectionForm";
 import { CollectionsTable } from "./CollectionsTable";
 import { HouseFilter } from "./HouseFilter";
+import { MonthFilter } from "./MonthFilter";
+import { PageHeader } from "./PageHeader";
 import { Pagination } from "./Pagination";
+import { Panel, PanelHeader } from "./ui/Panel";
 
-export function UserView() {
+/**
+ * Non-admin Overview. Collectors submit and see this month's rows;
+ * users only browse approved payments (the backend enforces both).
+ */
+export function UserView({ role }: { role: Role }) {
+  const isCollector = role === "collector";
   const [page, setPage] = useState(1);
   const [houseNumber, setHouseNumber] = useState<number | null>(null);
+  const [month, setMonth] = useState(currentMonth);
 
-  const { data, isLoading } = useCollections({
+  const { data, isLoading, isPlaceholderData } = useCollections({
     page,
     size: 10,
     house_number: houseNumber,
+    month: isCollector ? null : month,
   });
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-          Overview
-        </h1>
-        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-          Submit a collection and track this month&apos;s payments.
-        </p>
-      </div>
+    <div>
+      <PageHeader
+        title="Overview"
+        description={
+          isCollector
+            ? `Log each payment as you collect it. Showing ${formatMonth(currentMonth())}.`
+            : "Check which payments have been approved, by month and house."
+        }
+      />
 
-      <CollectionForm />
+      <div className="space-y-4">
+        {isCollector && <CollectionForm />}
 
-      <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-            This month&apos;s payments
-          </h2>
-          <HouseFilter
-            value={houseNumber}
-            onChange={(v) => {
-              setHouseNumber(v);
-              setPage(1);
-            }}
+        <Panel>
+          <PanelHeader
+            title={isCollector ? "This month" : "Approved payments"}
+            count={data?.total}
+          >
+            <div className="flex flex-wrap items-center gap-2">
+              {!isCollector && (
+                <MonthFilter
+                  value={month}
+                  onChange={(v) => {
+                    setMonth(v);
+                    setPage(1);
+                  }}
+                />
+              )}
+              <div className="flex-1 sm:flex-none">
+                <HouseFilter
+                  value={houseNumber}
+                  onChange={(v) => {
+                    setHouseNumber(v);
+                    setPage(1);
+                  }}
+                />
+              </div>
+            </div>
+          </PanelHeader>
+          <CollectionsTable
+            items={data?.items ?? []}
+            isLoading={isLoading}
+            isFetching={isPlaceholderData}
+            pageKey={`${page}-${houseNumber}-${month}`}
+            mode="status"
+            caption={isCollector ? "Your collections this month" : "Approved payments"}
+            empty={
+              isCollector
+                ? {
+                    icon: ReceiptText,
+                    title: houseNumber ? "No collections for this house yet" : "No collections this month yet",
+                    description: "Use the form above to log a payment; it shows here as pending until an admin approves it.",
+                  }
+                : {
+                    icon: Inbox,
+                    title: `No approved payments in ${formatMonthName(month)}`,
+                    description: "Try another month or clear the house filter.",
+                  }
+            }
           />
-        </div>
-        <CollectionsTable
-          items={data?.items ?? []}
-          isLoading={isLoading}
-          mode="status"
-        />
-        <Pagination
-          page={data?.page ?? page}
-          totalPages={data?.total_pages ?? 0}
-          onChange={setPage}
-        />
+          <Pagination
+            page={data?.page ?? page}
+            totalPages={data?.total_pages ?? 0}
+            total={data?.total ?? 0}
+            onChange={setPage}
+          />
+        </Panel>
       </div>
     </div>
   );
