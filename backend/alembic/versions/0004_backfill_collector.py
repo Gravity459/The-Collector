@@ -19,6 +19,13 @@ COLLECTOR_ID = "4454616f-10ff-426a-a4f3-df4066ecb742"
 
 def upgrade() -> None:
     conn = op.get_bind()
+    # Fresh installs have nothing to backfill, so the collector need not exist.
+    pending = conn.execute(
+        sa.text("SELECT 1 FROM collection WHERE collector_id IS NULL LIMIT 1")
+    ).first()
+    if not pending:
+        return
+
     exists = conn.execute(
         sa.text("SELECT 1 FROM users WHERE id = CAST(:id AS uuid)"),
         {"id": COLLECTOR_ID},

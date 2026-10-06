@@ -32,6 +32,8 @@ Visual system is documented in [`DESIGN.md`](DESIGN.md); product truth in [`PROD
 - Colours come only from the token classes in `tailwind.config.ts` (`bg`, `surface`, `fg`, `border`, `success`, `pending`, `danger`, `role-*`), defined for light and dark in `app/globals.css`. No raw zinc/blue/etc.
 - `chart-1` is reserved for the upcoming graphs; nothing else uses it.
 - Motion conveys state only (selection, rows entering/leaving, dialogs, values changing). Use `m.*` from `motion/react-m` and presets from `lib/motion.ts`; never `motion.*` (LazyMotion is strict).
+- Motion variants that can be swapped (e.g. dialog vs phone sheet) or interrupted (row exit then rollback) must set the same properties in every state, or a value gets stranded mid-tween (this once left the phone sheet ~37% transparent). Verify dialogs at phone width too.
+- `Dialog` portals to `<body>`; never let a modal inherit opacity/transform/text-align from where it is declared.
 - `cn()` is plain `clsx`: when a caller must override a primitive's default utility, use the `!` modifier.
 - Loading = skeletons, not spinners. Empty states say what will appear and what to do.
 - Desktop sidebar is a 64px icon rail that expands over content on hover/keyboard focus; the pin button keeps it open. Pin state lives in the `sidebar-pinned` cookie (`PIN_COOKIE` in `lib/types.ts`) and is read in `app/dashboard/layout.tsx` so the first paint never shifts.

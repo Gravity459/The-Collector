@@ -22,6 +22,11 @@ export const fadeIn: Variants = {
   exit: { opacity: 0, transition: { duration: 0.12, ease } },
 };
 
+/*
+ * dialog and sheet are swapped by viewport, so both MUST animate the same
+ * properties (opacity, scale, y). If one omitted opacity, swapping mid-flight
+ * would strand the panel half-transparent.
+ */
 export const dialog: Variants = {
   initial: { opacity: 0, scale: 0.97, y: 6 },
   animate: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.24, ease } },
@@ -29,9 +34,9 @@ export const dialog: Variants = {
 };
 
 export const sheet: Variants = {
-  initial: { y: "100%" },
-  animate: { y: 0, transition: { duration: 0.32, ease } },
-  exit: { y: "100%", transition: { duration: 0.2, ease } },
+  initial: { opacity: 1, scale: 1, y: "100%" },
+  animate: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.32, ease } },
+  exit: { opacity: 1, scale: 1, y: "100%", transition: { duration: 0.2, ease } },
 };
 
 /** A result set arriving: the container settles from the old page's dim, rows stagger. */
@@ -44,10 +49,12 @@ export const list: Variants = {
 };
 
 /** One row: rises in as part of a list; slides out sideways when removed. */
+// every state sets x and y: a row restored mid-exit (failed request rolled
+// back) must animate back to rest, not stay where the exit left it
 export const row: Variants = {
-  initial: { opacity: 0, y: 4 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.22, ease } },
-  exit: { opacity: 0, x: 24, transition: { duration: 0.18, ease } },
+  initial: { opacity: 0, x: 0, y: 4 },
+  animate: { opacity: 1, x: 0, y: 0, transition: { duration: 0.22, ease } },
+  exit: { opacity: 0, x: 24, y: 0, transition: { duration: 0.18, ease } },
 };
 
 /** Route content entering. */

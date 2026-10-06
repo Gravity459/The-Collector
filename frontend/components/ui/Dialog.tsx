@@ -3,7 +3,8 @@
 import { X } from "lucide-react";
 import { AnimatePresence, useDragControls } from "motion/react";
 import * as m from "motion/react-m";
-import { useEffect, useId, useRef } from "react";
+import { useEffect, useId, useRef, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 
 import { cn } from "@/lib/cn";
 import { dialog as dialogVariants, fadeIn, sheet } from "@/lib/motion";
@@ -29,8 +30,22 @@ interface Props {
  * rest of the page inert, contains focus, closes on Esc and restores focus to
  * the trigger. Centred on desktop; a bottom sheet with drag-to-dismiss on phones.
  */
+const noopSubscribe = () => () => {};
+
 export function Dialog(props: Props) {
-  return <AnimatePresence>{props.open && <DialogInner {...props} />}</AnimatePresence>;
+  // Portal to <body>: a dialog opened from a table row must not inherit the
+  // row's opacity/transform animations or the cell's text alignment.
+  // portal only after mount: the server and the first client render both output nothing
+  const mounted = useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false,
+  );
+  if (!mounted) return null;
+  return createPortal(
+    <AnimatePresence>{props.open && <DialogInner {...props} />}</AnimatePresence>,
+    document.body,
+  );
 }
 
 function DialogInner({
@@ -43,7 +58,7 @@ function DialogInner({
   className,
 }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
-  const phone = useMediaQuery(PHONE_QUERY);
+  const phone = useMediaQuery(PHONE_QUERY, { sync: true });
   const drag = useDragControls();
   const titleId = useId();
   const descId = useId();

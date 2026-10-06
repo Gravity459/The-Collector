@@ -2,9 +2,16 @@
 
 import { useEffect, useState } from "react";
 
-/** True while the media query matches. False during SSR and the first render. */
-export function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState(false);
+/**
+ * True while the media query matches. By default false during SSR and the
+ * first render (hydration-safe). Pass `sync` for components that only ever
+ * mount on the client after an interaction (e.g. dialogs), so their first
+ * frame already uses the right layout.
+ */
+export function useMediaQuery(query: string, { sync = false } = {}): boolean {
+  const [matches, setMatches] = useState(() =>
+    sync && typeof window !== "undefined" ? window.matchMedia(query).matches : false,
+  );
   useEffect(() => {
     const mq = window.matchMedia(query);
     const update = () => setMatches(mq.matches);
