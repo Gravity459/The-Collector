@@ -9,13 +9,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.deps import get_current_user, require_role
 from app.db.session import get_db
 from app.models.users import User
-from app.schemas.collection import CollectionCreate, CollectionOut, CollectionTotal
+from app.schemas.collection import (
+    MONTH_PATTERN,
+    CollectionCreate,
+    CollectionOut,
+    CollectionTotal,
+)
 from app.schemas.common import Page, PageParams
 from app.services.collection_service import CollectionService
 
 router = APIRouter(prefix="/collections", tags=["collections"])
-
-MONTH_PATTERN = r"^\d{4}-(0[1-9]|1[0-2])$"  # YYYY-MM
 
 
 @router.post("", response_model=CollectionOut, status_code=status.HTTP_201_CREATED)
@@ -53,7 +56,7 @@ async def list_collections(
             house_number=house_number,
             approved=True,
             month=month,
-            current_month_only=month is None,
+            current_period_only=month is None,
         )
 
     # collectors: current month only, all statuses

@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 import pytest
 from sqlalchemy import update
@@ -329,11 +329,14 @@ async def test_list_sorted_by_house_number(client, admin_token, collector_token)
 
 
 async def _backdate(db_session, collection_id: str) -> None:
-    """Move a collection into January 2025."""
+    """Move a collection into January 2025 (submitted and paid for)."""
     await db_session.execute(
         update(Collection)
         .where(Collection.id == collection_id)
-        .values(created_at=datetime(2025, 1, 15, tzinfo=timezone.utc))
+        .values(
+            created_at=datetime(2025, 1, 15, tzinfo=timezone.utc),
+            period_month=date(2025, 1, 1),
+        )
     )
     await db_session.commit()
 
@@ -399,3 +402,92 @@ async def test_pending_total_is_all_time(
         "/api/v1/collections/total?approved=false", headers=_auth(admin_token)
     )
     assert resp.json()["total"] == 350
+
+
+def _this_month() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m")
+
+
+async def test_period_month_defaults_to_current(client, collector_token):
+    resp = await client.post(
+        "/api/v1/collections",
+        headers=_auth(collector_token),
+        json={"house_number": 24, "amount": 4600},
+    )
+    assert resp.status_code == 201
+    assert resp.json()["period_month"] == _this_month()
+
+
+async def test_period_month_accepts_arrears_rejects_future(client, collector_token):
+    past = await client.post(
+        "/api/v1/collections",
+        headers=_auth(collector_token),
+        json={"house_number": 24, "amount": 4200, "period_month": "2025-03"},
+    )
+    assert past.status_code == 201
+    assert past.json()["period_month"] == "2025-03"
+
+    # same house, different month -> allowed
+    current = await client.post(
+        "/api/v1/collections",
+        headers=_auth(collector_token),
+        json={"house_number": 24, "amount": 4600},
+    )
+    assert current.status_code == 201
+
+    # same house, same month -> 409
+    dup = await client.post(
+        "/api/v1/collections",
+        headers=_auth(collector_token),
+        json={"house_number": 24, "amount": 4200, "period_month": "2025-03"},
+    )
+    assert dup.status_code == 409
+
+    future = await client.post(
+        "/api/v1/collections",
+        headers=_auth(collector_token),
+        json={"house_number": 25, "amount": 4600, "period_month": "2999-01"},
+    )
+    assert future.status_code == 422
+
+    bad = await client.post(
+        "/api/v1/collections",
+        headers=_auth(collector_token),
+        json={"house_number": 25, "amount": 4600, "period_month": "2025-13"},
+    )
+    assert bad.status_code == 422
+
+
+async def test_month_views_use_period_month(
+    client, admin_token, collector_token, user_token
+):
+    # submitted today, but paying for March 2025
+    created = await client.post(
+        "/api/v1/collections",
+        headers=_auth(collector_token),
+        json={"house_number": 5, "amount": 4200, "period_month": "2025-03"},
+    )
+    cid = created.json()["id"]
+    await client.patch(
+        f"/api/v1/collections/{cid}/approve", headers=_auth(admin_token)
+    )
+
+    for token in (admin_token, user_token):
+        march = await client.get(
+            "/api/v1/collections?approved=true&month=2025-03", headers=_auth(token)
+        )
+        assert [c["house_number"] for c in march.json()["items"]] == [5]
+
+    # not part of the current month's views or total
+    current = await client.get("/api/v1/collections", headers=_auth(user_token))
+    assert current.json()["total"] == 0
+    total = await client.get("/api/v1/collections/total", headers=_auth(admin_token))
+    assert total.json()["total"] == 0
+    march_total = await client.get(
+        "/api/v1/collections/total?month=2025-03", headers=_auth(admin_token)
+    )
+    assert march_total.json()["total"] == 4200
+
+    # the collector still sees it: it was submitted this month
+    mine = await client.get("/api/v1/collections", headers=_auth(collector_token))
+    assert [c["house_number"] for c in mine.json()["items"]] == [5]

@@ -11,7 +11,7 @@ import axios from "axios";
 import { toast } from "sonner";
 
 import { api } from "./api";
-import { houseLabel } from "./format";
+import { currentMonth, formatMonth, houseLabel } from "./format";
 import type { Collection, CollectionTotal, Page, Role, User } from "./types";
 
 /** Backend error `detail` (string, or FastAPI's 422 list) with a fallback. */
@@ -88,11 +88,17 @@ export function useCollectionTotal({
 export function useCreateCollection() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (body: { house_number: number; amount: number }) =>
-      (await api.post<Collection>("/collections", body)).data,
+    mutationFn: async (body: {
+      house_number: number;
+      amount: number;
+      period_month: string;
+    }) => (await api.post<Collection>("/collections", body)).data,
     onSuccess: (c) => {
       qc.invalidateQueries({ queryKey: ["collections"] });
-      toast.success(`Collection for ${houseLabel(c.house_number)} submitted`);
+      // name the month only for arrears, where it is worth double-checking
+      const forMonth =
+        c.period_month === currentMonth() ? "" : ` (${formatMonth(c.period_month)})`;
+      toast.success(`Collection for ${houseLabel(c.house_number)}${forMonth} submitted`);
     },
     onError: toastError(
       "Could not submit the collection. Check the values and try again.",
@@ -106,12 +112,6 @@ type TotalKey = readonly [
   { approved: boolean; month?: string | null },
 ];
 type ListKey = readonly ["collections", CollectionFilters];
-
-/** "YYYY-MM" of a timestamp; the backend's month filter keys on created_at. */
-function monthOf(iso: string): string {
-  const d = new Date(iso);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-}
 
 /** Add `delta` to every cached total matching `match`. */
 function bumpTotals(qc: QueryClient, match: (f: TotalKey[2]) => boolean, delta: number) {
@@ -137,7 +137,8 @@ async function applyOptimistic(
 ) {
   await qc.cancelQueries({ queryKey: ["collections"] });
   const snapshot = qc.getQueriesData({ queryKey: ["collections"] });
-  const month = monthOf(c.created_at);
+  // the backend's month filter and totals key on the month paid for
+  const month = c.period_month;
 
   // 1. the row leaves every list it is in
   qc.setQueriesData<Page<Collection>>({ queryKey: ["collections"] }, (old) => {

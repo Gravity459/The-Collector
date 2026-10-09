@@ -7,7 +7,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.collection import Collection
-from app.repositories.collection_repo import CollectionRepository
+from app.repositories.collection_repo import CollectionRepository, month_start
 from app.repositories.house_repo import HouseRepository
 from app.schemas.collection import CollectionCreate, CollectionOut, CollectionTotal
 from app.schemas.common import Page, PageParams
@@ -20,6 +20,7 @@ def _to_out(c: Collection) -> CollectionOut:
         house_id=c.house_id,
         house_number=c.house.house_number,
         amount=c.amount,
+        period_month=c.period_month.strftime("%Y-%m"),
         approved=c.approved,
         collector_name=c.collector.name if c.collector else None,
         created_at=c.created_at,
@@ -35,17 +36,28 @@ class CollectionService:
     async def submit(
         self, data: CollectionCreate, *, collector_id: uuid.UUID
     ) -> CollectionOut:
+        current = await self.collections.current_period()
+        period = month_start(data.period_month) if data.period_month else current
+        # arrears are fine; advance payments are not
+        if period > current:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="Payments can't be recorded for a future month.",
+            )
         house = await self.houses.get_or_create(data.house_number)
-        if await self.collections.exists_current_month(house.id):
+        if await self.collections.exists_for_period(house.id, period):
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail=(
                     f"A collection for house S-{data.house_number} already exists "
-                    "for this month."
+                    f"for {period:%B %Y}."
                 ),
             )
         created = await self.collections.create(
-            house_id=house.id, amount=data.amount, collector_id=collector_id
+            house_id=house.id,
+            amount=data.amount,
+            collector_id=collector_id,
+            period_month=period,
         )
         return _to_out(created)
 
@@ -87,6 +99,7 @@ class CollectionService:
         house_number: int | None = None,
         approved: bool | None = None,
         current_month_only: bool = False,
+        current_period_only: bool = False,
         month: str | None = None,
     ) -> Page[CollectionOut]:
         rows, total = await self.collections.list(
@@ -95,6 +108,7 @@ class CollectionService:
             house_number=house_number,
             approved=approved,
             current_month_only=current_month_only,
+            current_period_only=current_period_only,
             month=month,
         )
         items = [_to_out(c) for c in rows]

@@ -14,6 +14,8 @@ export interface Collection {
   house_id: string;
   house_number: number;
   amount: number;
+  /** Month the payment is for, "YYYY-MM" (may differ from created_at). */
+  period_month: string;
   approved: boolean;
   collector_name: string | null;
   created_at: string;

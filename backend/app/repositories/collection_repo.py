@@ -2,9 +2,9 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
-from sqlalchemy import func, select
+from sqlalchemy import Date, cast, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
@@ -12,11 +12,20 @@ from app.models.collection import Collection
 from app.models.houses import House
 
 
+def month_start(month: str) -> date:
+    """Convert "YYYY-MM" to the first day of that month."""
+    year, mon = month.split("-")
+    return date(int(year), int(mon), 1)
+
+
+def _current_period():
+    """First day of the current month, computed server-side."""
+    return cast(func.date_trunc("month", func.now()), Date)
+
+
 def _in_month(month: str):
-    """Rows whose created_at falls in `month` ("YYYY-MM"), computed server-side."""
-    return func.date_trunc("month", Collection.created_at) == func.to_timestamp(
-        month, "YYYY-MM"
-    )
+    """Rows paid for `month` ("YYYY-MM")."""
+    return Collection.period_month == month_start(month)
 
 
 class CollectionRepository:
@@ -31,12 +40,15 @@ class CollectionRepository:
         )
         return result.scalar_one_or_none()
 
-    async def exists_current_month(self, house_id: uuid.UUID) -> bool:
+    async def current_period(self) -> date:
+        return await self.db.scalar(select(_current_period()))  # type: ignore[return-value]
+
+    async def exists_for_period(self, house_id: uuid.UUID, period_month: date) -> bool:
         result = await self.db.scalar(
             select(func.count())
             .select_from(Collection)
             .where(Collection.house_id == house_id)
-            .where(Collection.created_at >= func.date_trunc("month", func.now()))
+            .where(Collection.period_month == period_month)
         )
         return bool(result)
 
@@ -53,17 +65,24 @@ class CollectionRepository:
         if month is not None:
             stmt = stmt.where(_in_month(month))
         elif not all_months:
-            stmt = stmt.where(
-                Collection.created_at >= func.date_trunc("month", func.now())
-            )
+            stmt = stmt.where(Collection.period_month == _current_period())
         result = await self.db.scalar(stmt)
         return int(result or 0)
 
     async def create(
-        self, *, house_id: uuid.UUID, amount: int, collector_id: uuid.UUID
+        self,
+        *,
+        house_id: uuid.UUID,
+        amount: int,
+        collector_id: uuid.UUID,
+        period_month: date,
     ) -> Collection:
         collection = Collection(
-            house_id=house_id, amount=amount, collector_id=collector_id, approved=False
+            house_id=house_id,
+            amount=amount,
+            collector_id=collector_id,
+            period_month=period_month,
+            approved=False,
         )
         self.db.add(collection)
         await self.db.flush()
@@ -89,6 +108,7 @@ class CollectionRepository:
         house_number: int | None = None,
         approved: bool | None = None,
         current_month_only: bool = False,
+        current_period_only: bool = False,
         month: str | None = None,
     ) -> tuple[list[Collection], int]:
         base = select(Collection).join(House, Collection.house_id == House.id)
@@ -98,9 +118,12 @@ class CollectionRepository:
         if approved is not None:
             base = base.where(Collection.approved == approved)
         if current_month_only:
+            # collectors: what was submitted this month, whatever month it pays for
             base = base.where(
                 Collection.created_at >= func.date_trunc("month", func.now())
             )
+        if current_period_only:
+            base = base.where(Collection.period_month == _current_period())
         if month is not None:
             base = base.where(_in_month(month))
 

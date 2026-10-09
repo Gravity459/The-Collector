@@ -4,12 +4,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { CURRENCY } from "@/lib/format";
+import { CURRENCY, currentMonth, formatMonth, shiftMonth } from "@/lib/format";
 import { useCreateCollection } from "@/lib/queries";
 
 import { Button } from "./ui/Button";
 import { Field } from "./ui/Field";
-import { Input } from "./ui/Input";
+import { Input, Select } from "./ui/Input";
 import { Panel } from "./ui/Panel";
 
 const schema = z.object({
@@ -21,7 +21,11 @@ const schema = z.object({
     .number({ invalid_type_error: "Enter the amount" })
     .int("Use a whole amount")
     .positive("Enter the amount"),
+  period_month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, "Pick the month"),
 });
+
+/** Months a payment can be for: this one and the 11 before it (no advances). */
+const MONTHS_BACK = 11;
 
 type FormValues = z.infer<typeof schema>;
 
@@ -32,13 +36,21 @@ type FormValues = z.infer<typeof schema>;
  */
 export function CollectionForm() {
   const create = useCreateCollection();
+  const thisMonth = currentMonth();
+  const months = Array.from({ length: MONTHS_BACK + 1 }, (_, i) =>
+    shiftMonth(thisMonth, -i),
+  );
   const {
     register,
     handleSubmit,
     reset,
     setFocus,
     formState: { errors },
-  } = useForm<FormValues>({ resolver: zodResolver(schema) });
+  } = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    // back to the current month after each submit, so arrears are always deliberate
+    defaultValues: { period_month: thisMonth },
+  });
 
   function onSubmit(values: FormValues) {
     create.mutate(values, {
@@ -82,6 +94,19 @@ export function CollectionForm() {
             autoComplete="off"
             {...register("amount")}
           />
+        </Field>
+        <Field
+          label="For month"
+          error={errors.period_month?.message}
+          className="col-span-2 sm:w-44"
+        >
+          <Select touch {...register("period_month")}>
+            {months.map((month) => (
+              <option key={month} value={month}>
+                {formatMonth(month)}
+              </option>
+            ))}
+          </Select>
         </Field>
         <Button
           type="submit"

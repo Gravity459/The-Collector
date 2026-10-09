@@ -2,7 +2,13 @@
 
 import type { LucideIcon } from "lucide-react";
 
-import { formatAmount, formatDate, houseLabel, relativeTime } from "@/lib/format";
+import {
+  formatAmount,
+  formatDate,
+  formatMonth,
+  houseLabel,
+  relativeTime,
+} from "@/lib/format";
 import type { Collection } from "@/lib/types";
 
 import { ApproveButton } from "./ApproveButton";
@@ -43,6 +49,13 @@ export function CollectionsTable({
       mobile: "primary",
       cell: (c) => (
         <span className="font-medium text-fg">{houseLabel(c.house_number)}</span>
+      ),
+    },
+    {
+      key: "month",
+      header: "For month",
+      cell: (c) => (
+        <span className="whitespace-nowrap text-fg-muted">{formatMonth(c.period_month)}</span>
       ),
     },
     {

@@ -50,8 +50,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 
 export const Select = forwardRef<
   HTMLSelectElement,
-  React.SelectHTMLAttributes<HTMLSelectElement> & { invalid?: boolean }
->(function Select({ className, invalid, children, ...props }, ref) {
+  React.SelectHTMLAttributes<HTMLSelectElement> & {
+    invalid?: boolean;
+    /** Larger, touch-friendly height (44px), matching Input. */
+    touch?: boolean;
+  }
+>(function Select({ className, invalid, touch, children, ...props }, ref) {
   return (
     <div className={cn("relative", className)}>
       <select
@@ -59,7 +63,8 @@ export const Select = forwardRef<
         aria-invalid={invalid || undefined}
         className={cn(
           base,
-          "h-9 cursor-pointer appearance-none pl-3 pr-9 text-sm",
+          "cursor-pointer appearance-none pl-3 pr-9",
+          touch ? "h-11 text-md sm:h-9 sm:text-sm" : "h-9 text-sm",
           invalid
             ? "border-danger/60 focus:border-danger focus:ring-danger/15"
             : "border-border-strong focus:border-fg/40 focus:ring-fg/10",
