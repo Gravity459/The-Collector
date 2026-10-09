@@ -6,6 +6,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.schemas.sheet_sync import SheetSyncSummary
+
 
 MONTH_PATTERN = r"^\d{4}-(0[1-9]|1[0-2])$"  # YYYY-MM
 
@@ -27,6 +29,8 @@ class CollectionOut(BaseModel):
     period_month: str  # YYYY-MM
     approved: bool
     collector_name: str | None = None
+    # null until approved with sheet sync on
+    sheet_sync: SheetSyncSummary | None = None
     created_at: datetime
     updated_at: datetime
 

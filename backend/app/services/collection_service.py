@@ -6,15 +6,19 @@ import uuid
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import get_settings
 from app.models.collection import Collection
 from app.repositories.collection_repo import CollectionRepository, month_start
 from app.repositories.house_repo import HouseRepository
+from app.repositories.sheet_sync_repo import SheetSyncRepository
 from app.schemas.collection import CollectionCreate, CollectionOut, CollectionTotal
+from app.schemas.sheet_sync import SheetSyncSummary
 from app.schemas.common import Page, PageParams
 from app.utils.pagination import build_page
 
 
 def _to_out(c: Collection) -> CollectionOut:
+    job = c.sheet_sync_job
     return CollectionOut(
         id=c.id,
         house_id=c.house_id,
@@ -23,6 +27,15 @@ def _to_out(c: Collection) -> CollectionOut:
         period_month=c.period_month.strftime("%Y-%m"),
         approved=c.approved,
         collector_name=c.collector.name if c.collector else None,
+        sheet_sync=(
+            SheetSyncSummary(
+                status=job.status,  # type: ignore[arg-type]
+                reason=job.reason,  # type: ignore[arg-type]
+                target_cell=job.target_cell,
+            )
+            if job is not None
+            else None
+        ),
         created_at=c.created_at,
         updated_at=c.updated_at,
     )
@@ -32,6 +45,7 @@ class CollectionService:
     def __init__(self, db: AsyncSession) -> None:
         self.collections = CollectionRepository(db)
         self.houses = HouseRepository(db)
+        self.sheet_jobs = SheetSyncRepository(db)
 
     async def submit(
         self, data: CollectionCreate, *, collector_id: uuid.UUID
@@ -73,6 +87,10 @@ class CollectionService:
                 detail="Collection already approved",
             )
         updated = await self.collections.approve(collection)
+        if get_settings().sheet_sync_enabled:
+            # same transaction: an approval never exists without its sheet job
+            await self.sheet_jobs.create_for_collection(updated.id)
+            updated = await self.collections.get_by_id(updated.id)  # type: ignore[assignment]
         return _to_out(updated)
 
     async def delete(self, collection_id: uuid.UUID) -> None:

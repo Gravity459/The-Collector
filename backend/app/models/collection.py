@@ -55,3 +55,10 @@ class Collection(UUIDMixin, TimestampMixin, Base):
 
     house: Mapped["House"] = relationship(back_populates="collections")  # noqa: F821
     collector: Mapped["User | None"] = relationship()  # noqa: F821
+    # DB cascades the delete; delete-orphan covers a job already loaded
+    sheet_sync_job: Mapped["SheetSyncJob | None"] = relationship(  # noqa: F821
+        back_populates="collection",
+        uselist=False,
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )

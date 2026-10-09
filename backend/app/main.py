@@ -33,11 +33,12 @@ def create_app() -> FastAPI:
         return {"status": "ok"}
 
     # Routers (mounted as phases land)
-    from app.api.v1 import auth, collections, users
+    from app.api.v1 import auth, collections, sheet_sync, users
 
     app.include_router(auth.router, prefix="/api/v1")
     app.include_router(users.router, prefix="/api/v1")
     app.include_router(collections.router, prefix="/api/v1")
+    app.include_router(sheet_sync.router, prefix="/api/v1")
 
     return app
 

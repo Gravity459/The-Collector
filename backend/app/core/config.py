@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
@@ -35,6 +35,21 @@ class Settings(BaseSettings):
 
     # App
     app_env: str = "development"
+
+    # Google Sheets sync (off until explicitly enabled)
+    sheet_sync_enabled: bool = False
+    # service-account key file contents: raw JSON or base64 of it
+    google_service_account_json: str = ""
+    google_sheet_id: str = ""
+    google_sheet_tab: str = ""
+    sheet_sync_max_attempts: int = 5
+    # shared with the frontend cron route; guards POST /sheet-sync/sweep
+    cron_secret: str = ""
+
+    # AI that reads the sheet's layout
+    ai_provider: Literal["gemini", "grok"] = "gemini"
+    ai_api_key: str = ""
+    ai_model: str = ""
 
     @field_validator("cors_origins", mode="before")
     @classmethod

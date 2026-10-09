@@ -10,37 +10,6 @@ def _auth(token: str) -> dict[str, str]:
     return {"Authorization": f"Bearer {token}"}
 
 
-async def _make_user(client, admin_token, *, email: str, role: str) -> str:
-    await client.post(
-        "/api/v1/users",
-        headers=_auth(admin_token),
-        json={
-            "name": role.title(),
-            "email": email,
-            "password": "secret-123",
-            "role": role,
-        },
-    )
-    login = await client.post(
-        "/api/v1/auth/login", json={"email": email, "password": "secret-123"}
-    )
-    return login.json()["access_token"]
-
-
-@pytest.fixture
-async def collector_token(client, admin_token):
-    return await _make_user(
-        client, admin_token, email="collector@example.com", role="collector"
-    )
-
-
-@pytest.fixture
-async def user_token(client, admin_token):
-    return await _make_user(
-        client, admin_token, email="resident@example.com", role="user"
-    )
-
-
 async def test_submit_creates_house_and_pending_collection(client, collector_token):
     resp = await client.post(
         "/api/v1/collections",

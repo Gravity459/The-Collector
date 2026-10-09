@@ -12,6 +12,13 @@ from app.models.collection import Collection
 from app.models.houses import House
 
 
+_LOAD = (
+    joinedload(Collection.house),
+    joinedload(Collection.collector),
+    joinedload(Collection.sheet_sync_job),
+)
+
+
 def month_start(month: str) -> date:
     """Convert "YYYY-MM" to the first day of that month."""
     year, mon = month.split("-")
@@ -35,8 +42,10 @@ class CollectionRepository:
     async def get_by_id(self, collection_id: uuid.UUID) -> Collection | None:
         result = await self.db.execute(
             select(Collection)
-            .options(joinedload(Collection.house), joinedload(Collection.collector))
+            .options(*_LOAD)
             .where(Collection.id == collection_id)
+            # re-read relationships (e.g. a sync job added after the first load)
+            .execution_options(populate_existing=True)
         )
         return result.scalar_one_or_none()
 
@@ -132,7 +141,7 @@ class CollectionRepository:
         ) or 0
 
         result = await self.db.execute(
-            base.options(joinedload(Collection.house), joinedload(Collection.collector))
+            base.options(*_LOAD)
             .order_by(House.house_number.asc(), Collection.created_at.desc())
             .offset(offset)
             .limit(limit)
