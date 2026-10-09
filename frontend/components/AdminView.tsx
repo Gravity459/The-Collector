@@ -20,6 +20,7 @@ import { HouseFilter } from "./HouseFilter";
 import { MonthFilter } from "./MonthFilter";
 import { PageHeader } from "./PageHeader";
 import { Pagination } from "./Pagination";
+import { SheetSyncReview } from "./SheetSyncReview";
 import { AnimatedNumber } from "./ui/AnimatedNumber";
 import { Panel } from "./ui/Panel";
 import { SegmentedTabs } from "./ui/SegmentedTabs";
@@ -228,6 +229,8 @@ export function AdminView() {
         </Kpi>
       </Panel>
 
+      <SheetSyncReview />
+
       <Panel>
         <div className="flex flex-col gap-3 border-b border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <SegmentedTabs<Tab>
@@ -281,6 +284,7 @@ export function AdminView() {
               pageKey={`approved-${approvedPage}-${houseNumber}-${month}`}
               mode="status"
               withRemove
+              withSheet
               caption={`Approved payments in ${formatMonthName(month)}`}
               empty={{
                 icon: Inbox,

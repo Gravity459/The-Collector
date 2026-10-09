@@ -62,6 +62,15 @@ export function formatMonth(month: string): string {
   });
 }
 
+/** "2026-10" -> "Oct 2026" (dense table cells) */
+export function formatMonthShort(month: string): string {
+  const [y, m] = month.split("-").map(Number);
+  return new Date(y, m - 1).toLocaleString(undefined, {
+    month: "short",
+    year: "numeric",
+  });
+}
+
 /** "2026-10" -> "October" */
 export function formatMonthName(month: string): string {
   const [y, m] = month.split("-").map(Number);

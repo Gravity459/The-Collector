@@ -9,6 +9,35 @@ export interface User {
   updated_at: string;
 }
 
+export type SheetSyncStatus = "pending" | "done" | "needs_review" | "failed";
+export type SheetSyncReason =
+  | "conflict"
+  | "house_not_in_sheet"
+  | "month_column_missing"
+  | "layout_unreadable";
+
+/** Where an approved payment stands in the Google Sheet. */
+export interface SheetSyncSummary {
+  status: SheetSyncStatus;
+  reason: SheetSyncReason | null;
+  target_cell: string | null;
+}
+
+export interface SheetSyncJob {
+  id: string;
+  collection_id: string;
+  house_number: number;
+  period_month: string;
+  amount: number;
+  status: SheetSyncStatus;
+  reason: SheetSyncReason | null;
+  target_cell: string | null;
+  existing_value: string | null;
+  error: string | null;
+  attempts: number;
+  updated_at: string;
+}
+
 export interface Collection {
   id: string;
   house_id: string;
@@ -18,6 +47,8 @@ export interface Collection {
   period_month: string;
   approved: boolean;
   collector_name: string | null;
+  /** Null unless approved while sheet sync was on. */
+  sheet_sync: SheetSyncSummary | null;
   created_at: string;
   updated_at: string;
 }

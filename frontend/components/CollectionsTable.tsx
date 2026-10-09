@@ -6,6 +6,7 @@ import {
   formatAmount,
   formatDate,
   formatMonth,
+  formatMonthShort,
   houseLabel,
   relativeTime,
 } from "@/lib/format";
@@ -14,6 +15,7 @@ import type { Collection } from "@/lib/types";
 import { ApproveButton } from "./ApproveButton";
 import { RejectButton } from "./RejectButton";
 import { RemoveButton } from "./RemoveButton";
+import { SheetSyncBadge } from "./SheetSyncBadge";
 import { StatusPill } from "./StatusPill";
 import { type Column, DataTable } from "./ui/DataTable";
 import { EmptyState } from "./ui/EmptyState";
@@ -25,6 +27,8 @@ interface Props {
   mode: "status" | "approve";
   /** Append a Remove action (used for approved payments). */
   withRemove?: boolean;
+  /** Show where each payment stands in the Google Sheet (admin, approved). */
+  withSheet?: boolean;
   caption: string;
   empty: { icon: LucideIcon; title: string; description?: string };
   /** See DataTable: identity of the result set, and background refetch. */
@@ -37,6 +41,7 @@ export function CollectionsTable({
   isLoading,
   mode,
   withRemove,
+  withSheet,
   caption,
   empty,
   pageKey,
@@ -55,7 +60,9 @@ export function CollectionsTable({
       key: "month",
       header: "For month",
       cell: (c) => (
-        <span className="whitespace-nowrap text-fg-muted">{formatMonth(c.period_month)}</span>
+        <span title={formatMonth(c.period_month)} className="whitespace-nowrap text-fg-muted">
+          {formatMonthShort(c.period_month)}
+        </span>
       ),
     },
     {
@@ -83,6 +90,16 @@ export function CollectionsTable({
             align: "center",
             mobile: "primary",
             cell: (c) => <StatusPill approved={c.approved} />,
+          } satisfies Column<Collection>,
+        ]
+      : []),
+    ...(withSheet
+      ? [
+          {
+            key: "sheet",
+            header: "Sheet",
+            align: "center",
+            cell: (c) => <SheetSyncBadge sync={c.sheet_sync} />,
           } satisfies Column<Collection>,
         ]
       : []),

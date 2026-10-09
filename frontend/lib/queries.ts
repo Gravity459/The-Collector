@@ -12,7 +12,14 @@ import { toast } from "sonner";
 
 import { api } from "./api";
 import { currentMonth, formatMonth, houseLabel } from "./format";
-import type { Collection, CollectionTotal, Page, Role, User } from "./types";
+import type {
+  Collection,
+  CollectionTotal,
+  Page,
+  Role,
+  SheetSyncJob,
+  User,
+} from "./types";
 
 /** Backend error `detail` (string, or FastAPI's 422 list) with a fallback. */
 export function errorMessage(error: unknown, fallback: string): string {
@@ -194,6 +201,18 @@ export function useApproveCollection() {
     onMutate: (c) => applyOptimistic(qc, c, "approve"),
     onSuccess: (c) => {
       toast.success(`Collection for ${houseLabel(c.house_number)} approved`);
+      // mirror it into the Google Sheet in the background; the approval
+      // already stands, so a sync problem shows up in the review panel,
+      // not as an approve error
+      if (c.sheet_sync) {
+        api
+          .post<SheetSyncJob>(`/collections/${c.id}/sheet-sync`)
+          .catch(() => undefined)
+          .finally(() => {
+            qc.invalidateQueries({ queryKey: ["collections"] });
+            qc.invalidateQueries({ queryKey: ["sheet-sync"] });
+          });
+      }
     },
     onError: (error, _c, snapshot) => {
       restore(qc, snapshot);
@@ -228,6 +247,50 @@ export function useDeleteCollection() {
     },
     onSettled: () => qc.invalidateQueries({ queryKey: ["collections"] }),
   });
+}
+
+/** Sheet writes that need the admin: conflicts, sheet problems, failures. */
+export function useSheetSyncJobs(page: number) {
+  return useQuery<Page<SheetSyncJob>>({
+    queryKey: ["sheet-sync", "jobs", { page }],
+    queryFn: async () =>
+      (await api.get<Page<SheetSyncJob>>("/sheet-sync/jobs", { params: { page, size: 10 } }))
+        .data,
+    placeholderData: keepPreviousData,
+  });
+}
+
+function useSheetJobAction(action: "overwrite" | "retry") {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (job: SheetSyncJob) =>
+      (await api.post<SheetSyncJob>(`/sheet-sync/jobs/${job.id}/${action}`)).data,
+    onSuccess: (job) => {
+      const house = houseLabel(job.house_number);
+      if (job.status === "done") {
+        toast.success(`${house} written to cell ${job.target_cell}`);
+      } else {
+        toast.error(`${house} still isn't in the sheet. See the reason below.`);
+      }
+    },
+    onError: toastError(
+      action === "overwrite"
+        ? "Could not overwrite the cell. Try again."
+        : "Could not retry the sheet write. Try again.",
+    ),
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: ["sheet-sync"] });
+      qc.invalidateQueries({ queryKey: ["collections"] });
+    },
+  });
+}
+
+export function useOverwriteSheetJob() {
+  return useSheetJobAction("overwrite");
+}
+
+export function useRetrySheetJob() {
+  return useSheetJobAction("retry");
 }
 
 export function useUsers(page: number) {
