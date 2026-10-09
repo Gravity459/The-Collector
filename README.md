@@ -42,7 +42,8 @@ A ledger for a single housing society. Collectors submit payments, admins approv
 | 🔎 **Filter by house and month** | Every list can be narrowed to a house (`S-14`) and a calendar month. Results are paginated, 10 per page. |
 | 👥 **User management** | Admins create accounts, reset passwords, and remove users (but not themselves). |
 | 🔐 **Role-based access, enforced on the server** | `collector`, `user` and `admin` roles are checked by FastAPI on every request. The UI only reflects what the server allows. |
-| 🛡️ **One payment per house per month** | A second submission for the same house in the same month is refused with `409 Conflict`. |
+| 🛡️ **One payment per house per month** | Each payment records the month it is **for** (the current month or an earlier one, for arrears). A second payment for the same house and month is refused with `409 Conflict`. |
+| 📗 **Google Sheet sync** | Approving a payment writes its amount into your maintenance sheet, in that house's row and that month's column. An AI (Gemini or Grok) reads the sheet's layout, code checks its answer, and anything doubtful waits for the admin. See [Google Sheets sync](#-google-sheets-sync). |
 | 🌗 **Light and dark themes** | Follows the system setting, with a manual toggle. Status is always shown with a label as well as a colour. |
 
 ## 👤 Roles
@@ -256,12 +257,34 @@ The backend has no build step. In production it runs as an ASGI app (`app.main:a
 
 1. **Sign in as the admin** using the seed credentials.
 2. Go to **Users → New user** and create at least one **Collector** account, plus **User** accounts for residents.
-3. **Collector:** on a phone, sign in, enter a house number (for example `14`, shown as `S-14`) and an amount, then tap **Submit collection**. The row shows as **Pending approval**.
-4. **Admin:** open **Overview**. The **Pending** tab lists everything awaiting review. Click **Approve**, or **✕** to reject (you will be asked to confirm). Use the **month picker** and **house filter** to narrow the lists. The KPI strip updates as you go.
+3. **Collector:** on a phone, sign in, enter a house number (for example `14`, shown as `S-14`), an amount, and the month it pays for (the current month by default), then tap **Submit collection**. The row shows as **Pending approval**.
+4. **Admin:** open **Overview**. The **Pending** tab lists everything awaiting review. Click **Approve**, or **✕** to reject (you will be asked to confirm). Use the **month picker** and **house filter** to narrow the lists. The KPI strip updates as you go. With sheet sync on, approved rows show the sheet cell they were written to, and **Sheet needs attention** lists any that were not.
 5. **Resident:** sign in to see **approved** payments only, by month and house.
 
 > [!NOTE]
-> Each house can have only **one collection per calendar month**. A duplicate is refused with a clear error message.
+> Each house can have only **one collection per month paid for**. A duplicate is refused with a clear error message. Month filters and totals go by the month paid for, not the day it was submitted.
+
+## 📗 Google Sheets sync
+
+When an admin approves a payment, the app writes the amount into your Google Sheet, in that house's row (`S-24`) and that month's column (`Amount (Sep 26)`).
+
+**How it works**
+
+1. Approving queues a sheet write, in the same transaction as the approval. The approval is the source of truth, and the sheet is a mirror. A sheet problem never undoes an approval.
+2. The backend reads the sheet. An AI (Gemini or Grok) describes its **layout**: header row, house column, month columns, house rows, and the total and summary rows. Names and phone numbers are removed before anything is sent.
+3. Code **checks every claim** against the real cells. A layout that fails is retried once with the errors, and is never used if it fails again. The checked layout is saved and reused until the sheet's header row or house column changes, so most approvals make no AI call.
+4. The amount is written to the house row × month column. If the month's column doesn't exist yet, it is **added** after the newest month. Total and summary rows are **never written**.
+5. If that cell already has anything in it (a number, `HOUSE EMPTY`, `-`), nothing is written. The payment appears under **Sheet needs attention** with an **Overwrite cell** button. Other problems (house not in the sheet, Google unreachable) get **Retry**, and a daily cron retries failures.
+
+**Set it up**
+
+1. In [Google Cloud Console](https://console.cloud.google.com/): create a project, enable the **Google Sheets API**, create a **service account**, and download its JSON key.
+2. Open your sheet → **Share** → add the service account's email (`…@….iam.gserviceaccount.com`) as an **Editor**.
+3. Get an AI key from [Google AI Studio](https://aistudio.google.com/) (Gemini) or [console.x.ai](https://console.x.ai/) (Grok). A small, fast model is plenty.
+4. Set the backend env vars (see [`backend/.env.example`](backend/.env.example)): `GOOGLE_SERVICE_ACCOUNT_JSON` (the key file's contents, or base64 of it), `GOOGLE_SHEET_ID`, `GOOGLE_SHEET_TAB`, `AI_PROVIDER`, `AI_API_KEY`, `AI_MODEL`, `CRON_SECRET` (same value as the frontend's), then `SHEET_SYNC_ENABLED=true`.
+
+> [!TIP]
+> Try it on a **copy** of your sheet first. When a new month column is added, its total cells are left empty for you to fill with your usual formulas.
 
 ## 🔌 API
 
@@ -271,7 +294,7 @@ All routes are under `/api/v1` and require `Authorization: Bearer <JWT>` (except
 | --- | --- | --- | --- |
 | `POST` | `/auth/login` | public | Exchange email and password for a JWT |
 | `GET` | `/auth/me` | any | The current user |
-| `POST` | `/collections` | collector | Submit `{house_number, amount}` |
+| `POST` | `/collections` | collector | Submit `{house_number, amount, period_month?}` (`YYYY-MM`, defaults to the current month; no future months) |
 | `GET` | `/collections` | any | List with `page`, `size`, `house_number`, `approved`, `month=YYYY-MM` (scoped by role) |
 | `GET` | `/collections/total` | any | Sum for `approved` + `month` |
 | `PATCH` | `/collections/{id}/approve` | admin | Approve a pending collection |
@@ -280,6 +303,11 @@ All routes are under `/api/v1` and require `Authorization: Bearer <JWT>` (except
 | `GET` | `/users` | admin | List users (paginated) |
 | `PATCH` | `/users/{id}/password` | admin | Change a user's password |
 | `DELETE` | `/users/{id}` | admin | Remove a user (not yourself) |
+| `POST` | `/collections/{id}/sheet-sync` | admin | Write an approved collection into the Google Sheet now |
+| `GET` | `/sheet-sync/jobs` | admin | Sheet writes needing attention (`status` filter, paginated) |
+| `POST` | `/sheet-sync/jobs/{id}/overwrite` | admin | Replace a cell that already had a value |
+| `POST` | `/sheet-sync/jobs/{id}/retry` | admin | Try a sheet write again |
+| `POST` | `/sheet-sync/sweep` | `X-Cron-Secret` | Daily cron: retry pending and failed writes |
 | `GET` | `/health`, `/health/db` | public | Liveness checks for the app and the database |
 
 ## 🧪 Testing
@@ -293,6 +321,8 @@ cd backend
 ```bash
 TEST_DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/collector_test uv run pytest -q
 ```
+
+Sheet sync tests need no Google or AI account. They use an in-memory copy of an anonymized maintenance sheet ([`tests/fixtures/maintenance_sheet.csv`](backend/tests/fixtures/maintenance_sheet.csv)), and the real Google, Gemini and Grok clients run against a mocked network.
 
 Frontend checks:
 
@@ -309,13 +339,14 @@ The app deploys as **one Vercel project with two Services**, defined in [`vercel
 
 Steps:
 
-1. Set the backend environment variables in Vercel: `DATABASE_URL`, `JWT_SECRET`, `JWT_EXPIRE_MINUTES`, `ADMIN_*`, and `CORS_ORIGINS` (your Vercel origin only).
+1. Set the backend environment variables in Vercel: `DATABASE_URL`, `JWT_SECRET`, `JWT_EXPIRE_MINUTES`, `ADMIN_*`, and `CORS_ORIGINS` (your Vercel origin only). For sheet sync, also set the variables in [Google Sheets sync](#-google-sheets-sync) and the same `CRON_SECRET` as the frontend.
 2. Set `CRON_SECRET` on the frontend.
-3. **Run migrations before deploying.** They are not run automatically:
+3. **Back up the database, then run migrations before deploying.** They are not run automatically. Migrations are written to be safe on a live database: the old code keeps working against the new schema.
    ```bash
    uv run alembic upgrade head
    ```
 4. Push to the connected branch. Vercel builds both services.
+5. Turn sheet sync on last: set `SHEET_SYNC_ENABLED=true` once the app runs fine, then redeploy.
 
 ## 📁 Project structure
 

@@ -10,6 +10,8 @@ Monorepo: `backend/` (FastAPI) + `frontend/` (Next.js). Postgres on Supabase.
 - Every schema change = an Alembic migration. Never edit the DB by hand.
 - Enforce RBAC at the API boundary with `require_role`; never trust a role sent from the client.
 - Search/filter/sort/pagination is GET + query params. Default page size 10.
+- Sheet sync never writes outside house rows × month columns (plus headers of month columns it creates); a non-empty cell always goes to admin review. AI output is only trusted after `validate_layout`, and residents' names/phones never go to the AI.
+- Migrations must keep the currently deployed code working (server default → backfill → constrain); rehearse on a local copy, never against Supabase.
 
 ## Backend conventions
 - Layers: `api → services → repositories → models`. Routers stay thin; logic in services.

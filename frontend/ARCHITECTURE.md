@@ -43,6 +43,12 @@ lib/
   - *Approved Payments* (`approved=true`).
   Both with `HouseFilter` + `Pagination`. Approve triggers query invalidation so rows move between sections.
 
+## Sheet sync
+- `useApproveCollection` fires `POST /api/collections/{id}/sheet-sync` after a successful approve when the response carries `sheet_sync`. It doesn't block, and errors are swallowed because the review panel shows them. Then it invalidates `collections` + `sheet-sync`.
+- `SheetSyncBadge` (admin approved list, "Sheet" column): icon + words in neutral ink (`Cell N7`, `Syncing`). `danger` marks `Needs review`/`Sync failed`. It is never a pill, because pills and green/grey belong to payment status.
+- `SheetSyncReview` renders above the collections panel only when `useSheetSyncJobs` has items. Each row has a plain-language reason. Conflicts get **Overwrite cell** (via `ConfirmModal`); everything else gets **Retry**.
+- `app/api/cron/sheet-sync/route.ts`: the Vercel Cron target. It checks `CRON_SECRET` and forwards to the backend sweep with `X-Cron-Secret`.
+
 ## Status pill
 `StatusPill` renders a pill: green (`approved`) / grey (`pending`). Single source of truth for status styling.
 
